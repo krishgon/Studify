@@ -4,8 +4,24 @@
 console.log('Studify: Content script loaded');
 
 // Keep references to observers and listeners to avoid duplicates
-let navigationObserver = null;
 let navigateListener = null;
+let currentVideoId = null;
+let isAnalyzing = false;
+
+// Function to check if we're on a YouTube watch page
+function isYouTubeWatchPage() {
+  const currentUrl = window.location.href;
+  const isWatchPage = currentUrl.includes('/watch?v=');
+  console.log('Studify: Current URL:', currentUrl);
+  console.log('Studify: Is watch page:', isWatchPage);
+  return isWatchPage;
+}
+
+// Function to get current video ID from URL
+function getCurrentVideoId() {
+  const urlParams = new URLSearchParams(window.location.search);
+  return urlParams.get('v');
+}
 
 // Function to check if video is educational
 function isEducationalVideo() {
@@ -48,14 +64,14 @@ function blockPage() {
       text-align: center;
       background-color: #f8f9fa;
     ">
-      <h1 style="color: #dc3545; margin-bottom: 20px;">🚫 Access Blocked</h1>
+      <h1 style="color: #dc3545; margin-bottom: 20px;"> Access Blocked</h1>
       <p style="font-size: 18px; color: #6c757d; margin-bottom: 30px;">
         This YouTube video is not categorized as educational content.
       </p>
       <p style="font-size: 16px; color: #6c757d;">
         Studify only allows educational videos to help you stay focused on learning.
       </p>
-      <button onclick="window.history.back()" style="
+      <button onclick="goBack()" style="
         background-color: #007bff;
         color: white;
         border: none;
@@ -71,31 +87,51 @@ function blockPage() {
   `;
 }
 
+// Simple goBack function that works better with YouTube
+function goBack() {
+  // Try to find YouTube's back button first
+  const backButton = document.querySelector('button[aria-label="Back"], .ytp-back-button, [data-tooltip*="back"]');
+  
+  if (backButton) {
+    backButton.click();
+  } else {
+    // Fallback to browser navigation with reload
+    window.history.back();
+    setTimeout(() => window.location.reload(), 100);
+  }
+}
+
 // Main function to run when page loads
 function main() {
   console.log('Studify: Starting content analysis...');
 
-  // Disconnect any existing observers or listeners to prevent duplicates
-  if (navigationObserver) {
-    navigationObserver.disconnect();
-    navigationObserver = null;
-  }
-  if (navigateListener) {
-    window.removeEventListener('yt-navigate-finish', navigateListener);
-    navigateListener = null;
-  }
-
-  // Wait a bit for YouTube to fully load
-  setTimeout(() => {
-    if (!isEducationalVideo()) {
-      blockPage();
-    } else {
-      console.log('Studify: Educational content detected - allowing access');
+  // Only run content filtering on YouTube watch pages
+  if (isYouTubeWatchPage()) {
+    const videoId = getCurrentVideoId();
+    
+    // Only analyze if this is a new video and we're not already analyzing
+    if (videoId && videoId !== currentVideoId && !isAnalyzing) {
+      currentVideoId = videoId;
+      isAnalyzing = true;
+      console.log('Studify: New video detected - analyzing content...');
+      
+      // Wait a bit for YouTube to fully load
+      setTimeout(() => {
+        if (!isEducationalVideo()) {
+          blockPage();
+        } else {
+          console.log('Studify: Educational content detected - allowing access');
+        }
+        isAnalyzing = false;
+      }, 2000);
+    } else if (videoId === currentVideoId) {
+      console.log('Studify: Same video, skipping analysis');
+    } else if (!videoId) {
+      console.log('Studify: No video ID found');
     }
-
-    // Set up observers and navigation listeners after evaluating the page
-    setupNavigationMonitoring();
-  }, 2000);
+  } else {
+    console.log('Studify: Not a watch page - allowing access to YouTube');
+  }
 }
 
 // Run the main function when the page is ready
@@ -105,35 +141,29 @@ if (document.readyState === 'loading') {
   main();
 }
 
-// Attach MutationObserver and navigation listener to detect video changes
-function setupNavigationMonitoring() {
-  // Disconnect existing observer if any
-  if (navigationObserver) {
-    navigationObserver.disconnect();
-  }
-
-  navigationObserver = new MutationObserver(() => {
-    console.log('Studify: Navigation detected via MutationObserver');
-    main();
-  });
-
-  const titleEl = document.querySelector('title');
-  const flexyEl = document.querySelector('ytd-watch-flexy');
-
-  if (titleEl) {
-    navigationObserver.observe(titleEl, { childList: true, subtree: true });
-  }
-  if (flexyEl) {
-    navigationObserver.observe(flexyEl, { childList: true, subtree: true });
-  }
-
-  // Set up YouTube's custom navigation event
+// Smart navigation monitoring - only triggers on actual video changes
+function setupSmartNavigationMonitoring() {
+  // Remove existing listener to prevent duplicates
   if (navigateListener) {
     window.removeEventListener('yt-navigate-finish', navigateListener);
   }
+  
+  // Only listen to YouTube's official navigation event
   navigateListener = () => {
-    console.log('Studify: Navigation detected via yt-navigate-finish');
-    main();
+    console.log('Studify: YouTube navigation detected');
+    
+    // Small delay to ensure page is fully loaded
+    setTimeout(() => {
+      // Reset analysis flag for new video
+      isAnalyzing = false;
+      main();
+    }, 1000);
   };
+  
   window.addEventListener('yt-navigate-finish', navigateListener);
 }
+
+// Set up navigation monitoring after initial page load
+setTimeout(() => {
+  setupSmartNavigationMonitoring();
+}, 3000);

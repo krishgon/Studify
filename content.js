@@ -5,13 +5,27 @@ console.log('Studify: Content script loaded');
 
 // Function to check if video is educational
 function isEducationalVideo() {
-  // This is a placeholder - we'll implement the actual logic later
-  // to read video category from YouTube's page source
   console.log('Studify: Checking video category...');
-  
-  // For now, return true to allow all videos
-  // Later we'll implement the actual category detection
-  return true;
+
+  let category = null;
+
+  const genreMeta = document.querySelector('meta[itemprop="genre"]');
+  if (genreMeta) {
+    category = genreMeta.getAttribute('content');
+  } else if (
+    window.ytInitialPlayerResponse &&
+    window.ytInitialPlayerResponse.microformat &&
+    window.ytInitialPlayerResponse.microformat.playerMicroformatRenderer &&
+    window.ytInitialPlayerResponse.microformat.playerMicroformatRenderer.category
+  ) {
+    category =
+      window.ytInitialPlayerResponse.microformat.playerMicroformatRenderer
+        .category;
+  }
+
+  console.log('Studify: Detected category:', category);
+
+  return category === 'Education';
 }
 
 // Function to block the page if video is not educational

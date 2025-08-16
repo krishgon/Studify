@@ -23,28 +23,52 @@ function getCurrentVideoId() {
   return urlParams.get('v');
 }
 
+// Retrieve the current video's category using multiple fallbacks
+function getVideoCategory() {
+  const genreMeta = document.querySelector('meta[itemprop="genre"]');
+  if (genreMeta) {
+    return genreMeta.getAttribute('content');
+  }
+
+  // Try the globally exposed player response first
+  let playerResponse = window.ytInitialPlayerResponse;
+
+  // Some navigations don't update ytInitialPlayerResponse, so try ytplayer config
+  if (!playerResponse &&
+      window.ytplayer &&
+      window.ytplayer.config &&
+      window.ytplayer.config.args &&
+      window.ytplayer.config.args.raw_player_response) {
+    try {
+      playerResponse = JSON.parse(
+        window.ytplayer.config.args.raw_player_response
+      );
+    } catch (e) {
+      console.error('Studify: Failed to parse raw_player_response', e);
+    }
+  }
+
+  if (playerResponse) {
+    if (
+      playerResponse.microformat &&
+      playerResponse.microformat.playerMicroformatRenderer &&
+      playerResponse.microformat.playerMicroformatRenderer.category
+    ) {
+      return playerResponse.microformat.playerMicroformatRenderer.category;
+    }
+    if (playerResponse.videoDetails && playerResponse.videoDetails.category) {
+      return playerResponse.videoDetails.category;
+    }
+  }
+
+  return null;
+}
+
 // Function to check if video is educational
 function isEducationalVideo() {
   console.log('Studify: Checking video category...');
-
-  let category = null;
-
-  const genreMeta = document.querySelector('meta[itemprop="genre"]');
-  if (genreMeta) {
-    category = genreMeta.getAttribute('content');
-  } else if (
-    window.ytInitialPlayerResponse &&
-    window.ytInitialPlayerResponse.microformat &&
-    window.ytInitialPlayerResponse.microformat.playerMicroformatRenderer &&
-    window.ytInitialPlayerResponse.microformat.playerMicroformatRenderer.category
-  ) {
-    category =
-      window.ytInitialPlayerResponse.microformat.playerMicroformatRenderer
-        .category;
-  }
-
+  const category = getVideoCategory();
   console.log('Studify: Detected category:', category);
-
   return category === 'Education';
 }
 

@@ -8,7 +8,7 @@ Studify helps students stay focused on learning by automatically filtering YouTu
 
 ## 🚀 Features
 
-- **Automatic Detection**: Reads video categories from YouTube's page source
+- **Automatic Category Detection**: Parses YouTube's `ytInitialPlayerResponse` data in the page source to identify the video's category
 - **Smart Filtering**: Only allows educational content
 - **User-Friendly Blocking**: Clean, informative blocking page with navigation options
 - **Real-Time Status**: Popup interface showing extension status
@@ -52,11 +52,15 @@ studify/
 
 ## 🔮 Future Enhancements
 
-- [ ] Implement actual video category detection from YouTube source
 - [ ] Add whitelist/blacklist functionality
 - [ ] Create settings page for user preferences
 - [ ] Add statistics and usage tracking
 - [ ] Support for other educational platforms
+
+## ⚠️ Limitations
+
+- Detection relies on YouTube's current page structure; layout changes may break category parsing.
+- Videos without accessible category metadata (such as some live streams or restricted videos) may bypass the filter.
 
 ## 📝 Development Notes
 
@@ -69,7 +73,7 @@ studify/
 
 This is a basic structure for the first commit. Future development will include:
 
-1. **Category Detection Logic**: Reading actual video categories from YouTube
+1. **Improved Category Detection**: Increasing accuracy and resilience to YouTube layout changes
 2. **Enhanced Blocking**: More sophisticated content filtering
 3. **User Settings**: Customizable blocking rules
 4. **Testing**: Comprehensive testing suite
@@ -84,4 +88,4 @@ This is a basic structure for the first commit. Future development will include:
 
 ---
 
-**Note**: This extension is currently in development. The category detection logic is a placeholder and will be implemented in future commits.
+**Note**: This extension is currently in development. Category detection depends on YouTube's page structure and may need updates if that structure changes.

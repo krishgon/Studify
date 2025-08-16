@@ -3,6 +3,10 @@
 
 console.log('Studify: Content script loaded');
 
+// Keep references to observers and listeners to avoid duplicates
+let navigationObserver = null;
+let navigateListener = null;
+
 // Function to check if video is educational
 function isEducationalVideo() {
   console.log('Studify: Checking video category...');
@@ -70,7 +74,17 @@ function blockPage() {
 // Main function to run when page loads
 function main() {
   console.log('Studify: Starting content analysis...');
-  
+
+  // Disconnect any existing observers or listeners to prevent duplicates
+  if (navigationObserver) {
+    navigationObserver.disconnect();
+    navigationObserver = null;
+  }
+  if (navigateListener) {
+    window.removeEventListener('yt-navigate-finish', navigateListener);
+    navigateListener = null;
+  }
+
   // Wait a bit for YouTube to fully load
   setTimeout(() => {
     if (!isEducationalVideo()) {
@@ -78,6 +92,9 @@ function main() {
     } else {
       console.log('Studify: Educational content detected - allowing access');
     }
+
+    // Set up observers and navigation listeners after evaluating the page
+    setupNavigationMonitoring();
   }, 2000);
 }
 
@@ -86,4 +103,37 @@ if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', main);
 } else {
   main();
+}
+
+// Attach MutationObserver and navigation listener to detect video changes
+function setupNavigationMonitoring() {
+  // Disconnect existing observer if any
+  if (navigationObserver) {
+    navigationObserver.disconnect();
+  }
+
+  navigationObserver = new MutationObserver(() => {
+    console.log('Studify: Navigation detected via MutationObserver');
+    main();
+  });
+
+  const titleEl = document.querySelector('title');
+  const flexyEl = document.querySelector('ytd-watch-flexy');
+
+  if (titleEl) {
+    navigationObserver.observe(titleEl, { childList: true, subtree: true });
+  }
+  if (flexyEl) {
+    navigationObserver.observe(flexyEl, { childList: true, subtree: true });
+  }
+
+  // Set up YouTube's custom navigation event
+  if (navigateListener) {
+    window.removeEventListener('yt-navigate-finish', navigateListener);
+  }
+  navigateListener = () => {
+    console.log('Studify: Navigation detected via yt-navigate-finish');
+    main();
+  };
+  window.addEventListener('yt-navigate-finish', navigateListener);
 }

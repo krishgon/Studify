@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Studify</title>
+    <style>
+        body {
+            width: 300px;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #007bff;
+            margin-bottom: 5px;
+        }
+        
+        .subtitle {
+            color: #6c757d;
+            font-size: 14px;
+        }
+        
+        .status {
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            border-radius: 6px;
+            padding: 15px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .status.active {
+            background-color: #d4edda;
+            border-color: #c3e6cb;
+            color: #155724;
+        }
+        
+        .status.inactive {
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+            color: #721c24;
+        }
+        
+        .info {
+            background-color: #e2e3e5;
+            border: 1px solid #d6d8db;
+            border-radius: 6px;
+            padding: 15px;
+            font-size: 14px;
+            color: #383d41;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 12px;
+            color: #6c757d;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo">📚 Studify</div>
+        <div class="subtitle">Educational Content Filter</div>
+    </div>
+    
+    <div class="status active" id="status">
+        <strong>🟢 Active</strong><br>
+        Filtering YouTube content...
+    </div>
+    
+    <div class="info">
+        <strong>How it works:</strong><br>
+        • Automatically detects video categories<br>
+        • Blocks non-educational content<br>
+        • Only allows educational videos<br>
+        • Helps you stay focused on learning
+    </div>
+    
+    <div class="footer">
+        Version 1.0.0<br>
+        Made with ❤️ for students by students
+    </div>
+    
+    <script src="popup.js"></script>
+</body>
+</html>

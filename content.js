@@ -130,7 +130,7 @@ function blockPage() {
       <p style="font-size: 16px; color: #6c757d;">
         Studify only allows educational videos to help you stay focused on learning.
       </p>
-      <button onclick="goBack()" style="
+      <button id="studify-go-back-btn" style="
         background-color: #007bff;
         color: white;
         border: none;
@@ -144,6 +144,11 @@ function blockPage() {
       </button>
     </div>
   `;
+
+  const btn = document.getElementById('studify-go-back-btn');
+  if (btn) {
+    btn.addEventListener('click', goBack, { once: true });
+  }
 }
 
 // Simple goBack function that works better with YouTube

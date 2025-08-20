@@ -47,6 +47,7 @@ function waitForGenreMeta() {
 function getVideoCategory() {
   const genreMeta = document.querySelector('meta[itemprop="genre"]');
   if (genreMeta) {
+    console.log("from the meta tag");
     return genreMeta.getAttribute('content');
   }
 
@@ -84,11 +85,43 @@ function getVideoCategory() {
   return null;
 }
 
-// Function to check if video is educational
+async function fetchCategoryFromOriginalHTML() {
+  try {
+    const res = await fetch(window.location.href, { cache: 'no-store', credentials: 'same-origin' });
+    const html = await res.text();
+
+    // Look for: <meta itemprop="genre" content="...">
+    const metaMatch = html.match(/<meta[^>]*itemprop=(['"])genre\1[^>]*>/i);
+    if (metaMatch) {
+      const tag = metaMatch[0];
+      const contentMatch = tag.match(/content=(['"])(.*?)\1/i);
+      if (contentMatch) {
+        console.log('Studify: Category from original HTML meta tag');
+        return contentMatch[2];
+      }
+    }
+
+    // Fallback: try JSON-LD if present
+    const ldMatch = html.match(/<script[^>]*type=(['"])application\/ld\+json\1[^>]*>([\s\S]*?)<\/script>/i);
+    if (ldMatch) {
+      try {
+        const json = JSON.parse(ldMatch[2]);
+        if (json && json.genre) return json.genre;
+        if (Array.isArray(json) && json[0] && json[0].genre) return json[0].genre;
+      } catch (e) {}
+    }
+  } catch (e) {
+    console.error('Studify: Failed to fetch original HTML', e);
+  }
+  return null;
+}
+
 async function isEducationalVideo() {
   console.log('Studify: Checking video category...');
-  await waitForGenreMeta();
-  const category = getVideoCategory();
+  let category = getVideoCategory();
+  if (!category) {
+    category = await fetchCategoryFromOriginalHTML();
+  }
   console.log('Studify: Detected category:', category);
   return category === 'Education';
 }

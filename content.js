@@ -213,9 +213,81 @@ function showWatchSidebar() {
   if (style) style.remove();
 }
 
+const SHORTS_STYLE_ID = 'studify-hide-shorts';
+
+function enableShortsHider() {
+  let style = document.getElementById(SHORTS_STYLE_ID);
+  if (!style) {
+    style = document.createElement('style');
+    style.id = SHORTS_STYLE_ID;
+    style.textContent = `
+      /* Hide Shorts UI across the site */
+      ytd-reel-shelf-renderer,
+      ytd-rich-shelf-renderer[is-shorts],
+      ytd-reel-video-renderer,
+      ytd-reel-item-renderer,
+      a.yt-simple-endpoint[href^="/shorts"],
+      ytd-mini-guide-entry-renderer[aria-label="Shorts"],
+      ytd-guide-entry-renderer a[href^="/shorts"] {
+        display: none !important;
+      }
+    `;
+    document.head.appendChild(style);
+  }
+}
+
+function isYouTubeShortsPage() {
+  return window.location.pathname.startsWith('/shorts');
+}
+
+function blockShortsPage() {
+  document.body.innerHTML = `
+    <div style="
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background-color: #f8f9fa;
+    ">
+      <h1 style="color: #dc3545; margin-bottom: 20px;">Shorts Blocked</h1>
+      <p style="font-size: 16px; color: #6c757d;">
+        Studify blocks YouTube Shorts to keep you focused.
+      </p>
+      <button id="studify-go-back-btn" style="
+        background-color: #007bff;
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 6px;
+        font-size: 16px;
+        cursor: pointer;
+        margin-top: 20px;
+      ">
+        Go Back
+      </button>
+    </div>
+  `;
+  const btn = document.getElementById('studify-go-back-btn');
+  if (btn) {
+    btn.addEventListener('click', goBack, { once: true });
+  }
+}
+
 // Main function to run when page loads
 function main() {
   console.log('Studify: Starting content analysis...');
+
+  // Always hide Shorts UI elements site-wide
+  enableShortsHider();
+
+  // Block Shorts pages entirely
+  if (isYouTubeShortsPage()) {
+    blockShortsPage();
+    return;
+  }
 
   // Only run content filtering on YouTube watch pages
   if (isYouTubeWatchPage()) {

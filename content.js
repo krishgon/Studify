@@ -165,6 +165,54 @@ function goBack() {
   }
 }
 
+const HOME_FEED_STYLE_ID = 'studify-hide-home-feed';
+
+function isYouTubeHomePage() {
+  return window.location.pathname === '/';
+}
+
+function hideHomeFeed() {
+  let style = document.getElementById(HOME_FEED_STYLE_ID);
+  if (!style) {
+    style = document.createElement('style');
+    style.id = HOME_FEED_STYLE_ID;
+    style.textContent = `
+      ytd-rich-grid-renderer,
+      ytd-browse[page-subtype="home"] #contents,
+      ytd-browse[page-subtype="home"] ytd-rich-grid-row {
+        display: none !important;
+      }
+    `;
+    document.head.appendChild(style);
+  }
+}
+
+function showHomeFeed() {
+  const style = document.getElementById(HOME_FEED_STYLE_ID);
+  if (style) style.remove();
+}
+
+const WATCH_SIDEBAR_STYLE_ID = 'studify-hide-watch-sidebar';
+
+function hideWatchSidebar() {
+  let style = document.getElementById(WATCH_SIDEBAR_STYLE_ID);
+  if (!style) {
+    style = document.createElement('style');
+    style.id = WATCH_SIDEBAR_STYLE_ID;
+    style.textContent = `
+      #related {
+        display: none !important;
+      }
+    `;
+    document.head.appendChild(style);
+  }
+}
+
+function showWatchSidebar() {
+  const style = document.getElementById(WATCH_SIDEBAR_STYLE_ID);
+  if (style) style.remove();
+}
+
 // Main function to run when page loads
 function main() {
   console.log('Studify: Starting content analysis...');
@@ -172,6 +220,7 @@ function main() {
   // Only run content filtering on YouTube watch pages
   if (isYouTubeWatchPage()) {
     const videoId = getCurrentVideoId();
+    hideWatchSidebar();
     
     // Only analyze if this is a new video and we're not already analyzing
     if (videoId && videoId !== currentVideoId && !isAnalyzing) {
@@ -193,7 +242,13 @@ function main() {
     } else if (!videoId) {
       console.log('Studify: No video ID found');
     }
+  } else if (isYouTubeHomePage()) {
+    hideHomeFeed();
+    showWatchSidebar();
+    console.log('Studify: Home page detected - hiding feed');
   } else {
+    showHomeFeed();
+    showWatchSidebar();
     console.log('Studify: Not a watch page - allowing access to YouTube');
   }
 }

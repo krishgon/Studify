@@ -80,11 +80,12 @@ This is a basic structure for the first commit. Future development will include:
 
 ## 📄 License
 
-[Add your license here]
+This project is proprietary software. Distributed only via the Chrome Web Store.  
+Unauthorized copying, modification, or redistribution is prohibited.  
 
 ## 👨‍💻 Author
 
-[Your Name] - Created for educational purposes
+Krish Agrawal
 
 ---
 

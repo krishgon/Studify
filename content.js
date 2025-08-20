@@ -23,25 +23,6 @@ function getCurrentVideoId() {
   return urlParams.get('v');
 }
 
-// Promise that resolves once the genre meta tag is available
-function waitForGenreMeta() {
-  return new Promise((resolve) => {
-    const existing = document.querySelector("meta[itemprop='genre']");
-    if (existing) {
-      return resolve();
-    }
-
-    const observer = new MutationObserver((mutations, obs) => {
-      const meta = document.querySelector("meta[itemprop='genre']");
-      if (meta) {
-        obs.disconnect();
-        resolve();
-      }
-    });
-
-    observer.observe(document.head, { childList: true, subtree: true });
-  });
-}
 
 // Retrieve the current video's category using multiple fallbacks
 function getVideoCategory() {

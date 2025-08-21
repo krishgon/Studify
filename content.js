@@ -9,6 +9,7 @@ let currentVideoId = null;
 let isAnalyzing = false;
 
 const DISABLED_UNTIL_KEY = 'studifyDisabledUntil';
+const STUDY_UNTIL_KEY = 'studifyStudyUntil';
 
 // Prompt the user for their intent and duration before allowing YouTube access
 function showPurposeOverlay() {
@@ -76,11 +77,16 @@ function showPurposeOverlay() {
         flex-direction: column;
         gap: 12px;
       }
-      .studify-inputs input {
+      .studify-inputs input,
+      .studify-inputs select {
         padding: 10px;
         font-size: 16px;
         border: 1px solid #cbd5e1;
         border-radius: 6px;
+      }
+      .studify-error {
+        color: #ef4444;
+        font-size: 14px;
       }
       .studify-start-btn {
         padding: 12px;
@@ -98,39 +104,72 @@ function showPurposeOverlay() {
 
     function askDuration(mode) {
       const modal = overlay.querySelector('.studify-modal');
+      const options = mode === 'browse'
+        ? [5, 10, 15, 30, 45, 60]
+        : [30, 60, 120, 180, 240];
+      const formatLabel = (m) => {
+        if (m % 60 === 0) {
+          const h = m / 60;
+          return `${h} hour${h > 1 ? 's' : ''}`;
+        }
+        return `${m} minutes`;
+      };
+      const selectHtml = options
+        .map((m) => `<option value="${m}">${formatLabel(m)}</option>`)
+        .join('');
+
       modal.innerHTML = `
-        <h1 class="studify-title">How many minutes will you ${mode}?</h1>
+        <h1 class="studify-title">How long will you ${mode}?</h1>
         <div class="studify-inputs">
-          <input id="studify-minutes" type="number" min="1" placeholder="Minutes">
+          <select id="studify-duration">${selectHtml}</select>
           ${mode === 'browse'
             ? '<input id="studify-confirm" type="text" placeholder="Type: I am sure I am not procrastinating">'
             : ''}
           <button class="studify-start-btn">Start</button>
+          <div class="studify-error" style="display:none;">Incorrect confirmation phrase</div>
         </div>
       `;
-      modal.querySelector('.studify-start-btn').addEventListener('click', () => {
-        const minutes = parseInt(document.getElementById('studify-minutes').value, 10);
+
+      const errorEl = modal.querySelector('.studify-error');
+      const startBtn = modal.querySelector('.studify-start-btn');
+      startBtn.addEventListener('click', () => {
+        errorEl.style.display = 'none';
+        const minutes = parseInt(document.getElementById('studify-duration').value, 10);
         if (isNaN(minutes) || minutes <= 0) return;
         if (mode === 'browse') {
-          const confirmation = document.getElementById('studify-confirm').value;
-          if (confirmation !== 'I am sure I am not procrastinating') return;
-
+          const confirmation = document.getElementById('studify-confirm').value.trim();
+          if (confirmation !== 'I am sure I am not procrastinating') {
+            errorEl.style.display = 'block';
+            return;
+          }
           const disabledUntil = Date.now() + minutes * 60 * 1000;
           localStorage.setItem(DISABLED_UNTIL_KEY, String(disabledUntil));
+          try {
+            if (chrome && chrome.storage && chrome.storage.local) {
+              chrome.storage.local.set({ [DISABLED_UNTIL_KEY]: String(disabledUntil) });
+            }
+          } catch (e) {}
           overlay.remove();
           resolve('browse');
         } else {
+          const studyUntil = Date.now() + minutes * 60 * 1000;
+          localStorage.setItem(STUDY_UNTIL_KEY, String(studyUntil));
           overlay.remove();
           resolve('study');
         }
       });
 
+      if (mode === 'browse') {
+        const confirmInput = document.getElementById('studify-confirm');
+        confirmInput.addEventListener('input', () => {
+          errorEl.style.display = 'none';
+        });
+      }
     }
 
     overlay.querySelectorAll('.studify-btn').forEach((btn) => {
       btn.addEventListener('click', () => askDuration(btn.dataset.mode));
     });
-
 
     (document.body || document.documentElement).appendChild(overlay);
   });
@@ -522,27 +561,57 @@ function setupSmartNavigationMonitoring() {
 async function init() {
   const disabledUntil = parseInt(localStorage.getItem(DISABLED_UNTIL_KEY) || '0', 10);
   if (Date.now() < disabledUntil) {
+    try {
+      if (chrome && chrome.storage && chrome.storage.local) {
+        chrome.storage.local.set({ [DISABLED_UNTIL_KEY]: String(disabledUntil) });
+      }
+    } catch (e) {}
     const remaining = disabledUntil - Date.now();
     console.log('Studify: Extension paused for browsing mode');
     setTimeout(() => {
+      try {
+        if (chrome && chrome.storage && chrome.storage.local) {
+          chrome.storage.local.remove(DISABLED_UNTIL_KEY);
+        }
+      } catch (e) {}
       localStorage.removeItem(DISABLED_UNTIL_KEY);
       window.location.reload();
     }, remaining);
     return;
+  } else {
+    try {
+      if (chrome && chrome.storage && chrome.storage.local) {
+        chrome.storage.local.remove(DISABLED_UNTIL_KEY);
+      }
+    } catch (e) {}
   }
 
-  const choice = await showPurposeOverlay();
-  if (choice === 'browse') {
-    const disabledUntilNew = parseInt(localStorage.getItem(DISABLED_UNTIL_KEY) || '0', 10);
-    const remaining = disabledUntilNew - Date.now();
-    if (remaining > 0) {
-      setTimeout(() => {
-        localStorage.removeItem(DISABLED_UNTIL_KEY);
-        window.location.reload();
-      }, remaining);
+  const studyUntil = parseInt(localStorage.getItem(STUDY_UNTIL_KEY) || '0', 10);
+  let inStudy = Date.now() < studyUntil;
+
+  if (!inStudy) {
+    const choice = await showPurposeOverlay();
+    if (choice === 'browse') {
+      const disabledUntilNew = parseInt(localStorage.getItem(DISABLED_UNTIL_KEY) || '0', 10);
+      const remaining = disabledUntilNew - Date.now();
+      if (remaining > 0) {
+        setTimeout(() => {
+          try {
+            if (chrome && chrome.storage && chrome.storage.local) {
+              chrome.storage.local.remove(DISABLED_UNTIL_KEY);
+            }
+          } catch (e) {}
+          localStorage.removeItem(DISABLED_UNTIL_KEY);
+          window.location.reload();
+        }, remaining);
+      }
+      return;
     }
-    return;
+    inStudy = true;
   }
+
+  const studyEnd = parseInt(localStorage.getItem(STUDY_UNTIL_KEY) || '0', 10);
+  const remainingStudy = studyEnd - Date.now();
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', main);
@@ -553,6 +622,13 @@ async function init() {
   setTimeout(() => {
     setupSmartNavigationMonitoring();
   }, 3000);
+
+  if (remainingStudy > 0) {
+    setTimeout(() => {
+      localStorage.removeItem(STUDY_UNTIL_KEY);
+      window.location.reload();
+    }, remainingStudy);
+  }
 }
 
 init();

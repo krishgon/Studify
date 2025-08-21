@@ -5,7 +5,8 @@
   "description": "A Chrome extension that blocks uneducational YouTube videos by reading video categories from page source",
   "permissions": [
     "activeTab",
-    "scripting"
+    "scripting",
+    "storage"
   ],
   "host_permissions": [
     "https://www.youtube.com/*"

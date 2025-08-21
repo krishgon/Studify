@@ -23,6 +23,7 @@
     "default_title": "Studify - Mindful YouTube for Study & Focus"
   },
   "icons": {
+    "16": "icons/iconCirc16.png",
     "48": "icons/iconCirc48.png",
     "128": "icons/iconCirc128.png"
   }

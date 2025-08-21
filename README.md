@@ -12,6 +12,7 @@ Studify helps students stay focused on learning by automatically filtering YouTu
 - **Smart Filtering**: Only allows educational content
 - **User-Friendly Blocking**: Clean, informative blocking page with navigation options
 - **Real-Time Status**: Popup interface showing extension status
+- **Intent Check**: Full‑screen prompt when opening YouTube asks whether you're studying or browsing and for how long. Browsing requires typing *"I am sure I am not procrastinating"* and temporarily disables filtering.
 
 ## 📁 File Structure
 

@@ -8,6 +8,131 @@ let navigateListener = null;
 let currentVideoId = null;
 let isAnalyzing = false;
 
+const DISABLED_UNTIL_KEY = 'studifyDisabledUntil';
+
+// Prompt the user for their intent and duration before allowing YouTube access
+function showPurposeOverlay() {
+  return new Promise((resolve) => {
+    const overlay = document.createElement('div');
+    overlay.id = 'studify-purpose-overlay';
+    overlay.innerHTML = `
+      <div class="studify-modal">
+        <h1 class="studify-title">What brings you to YouTube?</h1>
+        <div class="studify-choice">
+          <button class="studify-btn" data-mode="study">Study</button>
+          <button class="studify-btn" data-mode="browse">Browse</button>
+        </div>
+      </div>
+    `;
+
+    const style = document.createElement('style');
+    style.textContent = `
+      #studify-purpose-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 9999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(0, 0, 0, 0.6);
+        backdrop-filter: blur(6px);
+        font-family: 'Segoe UI', Roboto, sans-serif;
+      }
+      #studify-purpose-overlay .studify-modal {
+        background: #ffffff;
+        border-radius: 12px;
+        padding: 40px 30px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        text-align: center;
+        max-width: 400px;
+        width: 90%;
+      }
+      #studify-purpose-overlay h1 {
+        margin: 0 0 20px;
+        font-size: 24px;
+        color: #111827;
+      }
+      .studify-choice {
+        display: flex;
+        gap: 16px;
+        justify-content: center;
+      }
+      .studify-btn {
+        flex: 1;
+        padding: 12px 0;
+        font-size: 16px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        color: #ffffff;
+        transition: background 0.2s;
+      }
+      .studify-btn[data-mode="study"] { background: #22c55e; }
+      .studify-btn[data-mode="study"]:hover { background: #16a34a; }
+      .studify-btn[data-mode="browse"] { background: #3b82f6; }
+      .studify-btn[data-mode="browse"]:hover { background: #2563eb; }
+      .studify-inputs {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+      .studify-inputs input {
+        padding: 10px;
+        font-size: 16px;
+        border: 1px solid #cbd5e1;
+        border-radius: 6px;
+      }
+      .studify-start-btn {
+        padding: 12px;
+        background: #6366f1;
+        color: #ffffff;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: background 0.2s;
+      }
+      .studify-start-btn:hover { background: #4f46e5; }
+    `;
+    overlay.appendChild(style);
+
+    function askDuration(mode) {
+      const modal = overlay.querySelector('.studify-modal');
+      modal.innerHTML = `
+        <h1 class="studify-title">How many minutes will you ${mode}?</h1>
+        <div class="studify-inputs">
+          <input id="studify-minutes" type="number" min="1" placeholder="Minutes">
+          ${mode === 'browse'
+            ? '<input id="studify-confirm" type="text" placeholder="Type: I am sure I am not procrastinating">'
+            : ''}
+          <button class="studify-start-btn">Start</button>
+        </div>
+      `;
+      modal.querySelector('.studify-start-btn').addEventListener('click', () => {
+        const minutes = parseInt(document.getElementById('studify-minutes').value, 10);
+        if (isNaN(minutes) || minutes <= 0) return;
+        if (mode === 'browse') {
+          const confirmation = document.getElementById('studify-confirm').value;
+          if (confirmation !== 'I am sure I am not procrastinating') return;
+          const disabledUntil = Date.now() + minutes * 60 * 1000;
+          localStorage.setItem(DISABLED_UNTIL_KEY, String(disabledUntil));
+          overlay.remove();
+          resolve('browse');
+        } else {
+          overlay.remove();
+          resolve('study');
+        }
+      });
+    }
+
+    overlay.querySelectorAll('.studify-btn').forEach((btn) => {
+      btn.addEventListener('click', () => askDuration(btn.dataset.mode));
+    });
+
+    (document.body || document.documentElement).appendChild(overlay);
+  });
+}
+
 // Function to check if we're on a YouTube watch page
 function isYouTubeWatchPage() {
   const currentUrl = window.location.href;
@@ -110,40 +235,61 @@ async function isEducationalVideo() {
 // Function to block the page if video is not educational
 function blockPage() {
   console.log('Studify: Blocking non-educational content');
-  
-  // Clear the page content
+
   document.body.innerHTML = `
-    <div style="
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      font-family: Arial, sans-serif;
-      text-align: center;
-      background-color: #f8f9fa;
-    ">
-      <h1 style="color: #dc3545; margin-bottom: 20px;"> Access Blocked</h1>
-      <p style="font-size: 18px; color: #6c757d; margin-bottom: 30px;">
-        This YouTube video is not categorized as educational content.
-      </p>
-      <p style="font-size: 16px; color: #6c757d;">
-        Studify only allows educational videos to help you stay focused on learning.
-      </p>
-      <button id="studify-go-back-btn" style="
-        background-color: #007bff;
-        color: white;
-        border: none;
-        padding: 12px 24px;
-        border-radius: 6px;
-        font-size: 16px;
-        cursor: pointer;
-        margin-top: 20px;
-      ">
-        Go Back
-      </button>
+    <div id="studify-block-page">
+      <div class="studify-modal">
+        <h1>Access Blocked</h1>
+        <p>This YouTube video is not categorized as educational content.</p>
+        <p>Studify only allows educational videos to help you stay focused on learning.</p>
+        <button id="studify-go-back-btn">Go Back</button>
+      </div>
     </div>
   `;
+
+  const style = document.createElement('style');
+  style.textContent = `
+    #studify-block-page {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #0f172a;
+      color: #e2e8f0;
+      font-family: 'Segoe UI', Roboto, sans-serif;
+    }
+    #studify-block-page .studify-modal {
+      background: #1e293b;
+      padding: 40px 30px;
+      border-radius: 12px;
+      text-align: center;
+      max-width: 480px;
+      width: 90%;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    }
+    #studify-block-page h1 {
+      margin-bottom: 16px;
+      color: #f87171;
+    }
+    #studify-block-page p {
+      margin-bottom: 20px;
+      color: #cbd5e1;
+      line-height: 1.4;
+    }
+    #studify-go-back-btn {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      background: #3b82f6;
+      color: #ffffff;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    #studify-go-back-btn:hover { background: #2563eb; }
+  `;
+  document.head.appendChild(style);
 
   const btn = document.getElementById('studify-go-back-btn');
   if (btn) {
@@ -242,34 +388,57 @@ function isYouTubeShortsPage() {
 
 function blockShortsPage() {
   document.body.innerHTML = `
-    <div style="
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      font-family: Arial, sans-serif;
-      text-align: center;
-      background-color: #f8f9fa;
-    ">
-      <h1 style="color: #dc3545; margin-bottom: 20px;">Shorts Blocked</h1>
-      <p style="font-size: 16px; color: #6c757d;">
-        Studify blocks YouTube Shorts to keep you focused.
-      </p>
-      <button id="studify-go-back-btn" style="
-        background-color: #007bff;
-        color: white;
-        border: none;
-        padding: 12px 24px;
-        border-radius: 6px;
-        font-size: 16px;
-        cursor: pointer;
-        margin-top: 20px;
-      ">
-        Go Back
-      </button>
+    <div id="studify-block-page">
+      <div class="studify-modal">
+        <h1>Shorts Blocked</h1>
+        <p>Studify blocks YouTube Shorts to keep you focused.</p>
+        <button id="studify-go-back-btn">Go Back</button>
+      </div>
     </div>
   `;
+  const style = document.createElement('style');
+  style.textContent = `
+    #studify-block-page {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #0f172a;
+      color: #e2e8f0;
+      font-family: 'Segoe UI', Roboto, sans-serif;
+    }
+    #studify-block-page .studify-modal {
+      background: #1e293b;
+      padding: 40px 30px;
+      border-radius: 12px;
+      text-align: center;
+      max-width: 480px;
+      width: 90%;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    }
+    #studify-block-page h1 {
+      margin-bottom: 16px;
+      color: #f87171;
+    }
+    #studify-block-page p {
+      margin-bottom: 20px;
+      color: #cbd5e1;
+      line-height: 1.4;
+    }
+    #studify-go-back-btn {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      background: #3b82f6;
+      color: #ffffff;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    #studify-go-back-btn:hover { background: #2563eb; }
+  `;
+  document.head.appendChild(style);
   const btn = document.getElementById('studify-go-back-btn');
   if (btn) {
     btn.addEventListener('click', goBack, { once: true });
@@ -325,24 +494,17 @@ function main() {
   }
 }
 
-// Run the main function when the page is ready
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', main);
-} else {
-  main();
-}
-
 // Smart navigation monitoring - only triggers on actual video changes
 function setupSmartNavigationMonitoring() {
   // Remove existing listener to prevent duplicates
   if (navigateListener) {
     window.removeEventListener('yt-navigate-finish', navigateListener);
   }
-  
+
   // Only listen to YouTube's official navigation event
   navigateListener = () => {
     console.log('Studify: YouTube navigation detected');
-    
+
     // Small delay to ensure page is fully loaded
     setTimeout(() => {
       // Reset analysis flag for new video
@@ -350,11 +512,44 @@ function setupSmartNavigationMonitoring() {
       main();
     }, 1000);
   };
-  
+
   window.addEventListener('yt-navigate-finish', navigateListener);
 }
 
-// Set up navigation monitoring after initial page load
-setTimeout(() => {
-  setupSmartNavigationMonitoring();
-}, 3000);
+async function init() {
+  const disabledUntil = parseInt(localStorage.getItem(DISABLED_UNTIL_KEY) || '0', 10);
+  if (Date.now() < disabledUntil) {
+    const remaining = disabledUntil - Date.now();
+    console.log('Studify: Extension paused for browsing mode');
+    setTimeout(() => {
+      localStorage.removeItem(DISABLED_UNTIL_KEY);
+      window.location.reload();
+    }, remaining);
+    return;
+  }
+
+  const choice = await showPurposeOverlay();
+  if (choice === 'browse') {
+    const disabledUntilNew = parseInt(localStorage.getItem(DISABLED_UNTIL_KEY) || '0', 10);
+    const remaining = disabledUntilNew - Date.now();
+    if (remaining > 0) {
+      setTimeout(() => {
+        localStorage.removeItem(DISABLED_UNTIL_KEY);
+        window.location.reload();
+      }, remaining);
+    }
+    return;
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', main);
+  } else {
+    main();
+  }
+
+  setTimeout(() => {
+    setupSmartNavigationMonitoring();
+  }, 3000);
+}
+
+init();

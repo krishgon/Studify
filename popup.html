@@ -5,65 +5,80 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Studify</title>
     <style>
-        body {
-            width: 300px;
-            padding: 20px;
-            font-family: Arial, sans-serif;
-            background-color: #f8f9fa;
+        :root {
+            --bg: #0f172a;
+            --card-bg: #1e293b;
+            --accent: #6366f1;
+            --text: #f1f5f9;
+            --muted: #94a3b8;
+            --success: #22c55e;
+            --success-bg: #22c55e33;
+            --success-border: #22c55e66;
+            --danger: #ef4444;
+            --danger-bg: #ef444433;
+            --danger-border: #ef444466;
         }
-        
+
+        body {
+            width: 320px;
+            margin: 0;
+            padding: 20px;
+            font-family: 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+        }
+
         .header {
             text-align: center;
             margin-bottom: 20px;
         }
-        
+
         .logo {
             font-size: 24px;
-            font-weight: bold;
-            color: #007bff;
+            font-weight: 600;
+            color: var(--accent);
             margin-bottom: 5px;
         }
-        
+
         .subtitle {
-            color: #6c757d;
+            color: var(--muted);
             font-size: 14px;
         }
-        
+
         .status {
-            background-color: #d4edda;
-            border: 1px solid #c3e6cb;
-            border-radius: 6px;
+            border-radius: 8px;
             padding: 15px;
             margin-bottom: 20px;
             text-align: center;
+            border: 1px solid;
         }
-        
+
         .status.active {
-            background-color: #d4edda;
-            border-color: #c3e6cb;
-            color: #155724;
+            background: var(--success-bg);
+            border-color: var(--success-border);
+            color: var(--success);
         }
-        
+
         .status.inactive {
-            background-color: #f8d7da;
-            border-color: #f5c6cb;
-            color: #721c24;
+            background: var(--danger-bg);
+            border-color: var(--danger-border);
+            color: var(--danger);
         }
-        
+
         .info {
-            background-color: #e2e3e5;
-            border: 1px solid #d6d8db;
-            border-radius: 6px;
+            background: var(--card-bg);
+            border: 1px solid #334155;
+            border-radius: 8px;
             padding: 15px;
             font-size: 14px;
-            color: #383d41;
+            line-height: 1.4;
         }
-        
+
         .footer {
             text-align: center;
             margin-top: 20px;
             font-size: 12px;
-            color: #6c757d;
+            color: var(--muted);
         }
     </style>
 </head>

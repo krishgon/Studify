@@ -8,6 +8,97 @@ let navigateListener = null;
 let currentVideoId = null;
 let isAnalyzing = false;
 
+const DISABLED_UNTIL_KEY = 'studifyDisabledUntil';
+
+// Prompt the user for their intent and duration before allowing YouTube access
+function showPurposeOverlay() {
+  return new Promise((resolve) => {
+    const overlay = document.createElement('div');
+    overlay.id = 'studify-purpose-overlay';
+    Object.assign(overlay.style, {
+      position: 'fixed',
+      top: '0',
+      left: '0',
+      width: '100%',
+      height: '100%',
+      backgroundColor: '#ffffff',
+      zIndex: '9999',
+      display: 'flex',
+      flexDirection: 'column',
+      justifyContent: 'center',
+      alignItems: 'center',
+      fontFamily: 'Arial, sans-serif',
+    });
+
+    const title = document.createElement('h1');
+    title.textContent = 'Why are you visiting YouTube?';
+    overlay.appendChild(title);
+
+    const buttons = document.createElement('div');
+    buttons.style.display = 'flex';
+    buttons.style.gap = '20px';
+    overlay.appendChild(buttons);
+
+    const studyBtn = document.createElement('button');
+    studyBtn.textContent = 'Study';
+    const browseBtn = document.createElement('button');
+    browseBtn.textContent = 'Browse';
+
+    [studyBtn, browseBtn].forEach((btn) => {
+      btn.style.padding = '10px 20px';
+      btn.style.fontSize = '16px';
+      btn.style.cursor = 'pointer';
+    });
+
+    buttons.append(studyBtn, browseBtn);
+
+    function askDuration(mode) {
+      title.textContent = `How many minutes will you ${mode}?`;
+      buttons.innerHTML = '';
+
+      const input = document.createElement('input');
+      input.type = 'number';
+      input.min = '1';
+      input.style.padding = '8px';
+      input.style.fontSize = '16px';
+
+      const startBtn = document.createElement('button');
+      startBtn.textContent = 'Continue';
+      startBtn.style.padding = '10px 20px';
+      startBtn.style.marginLeft = '10px';
+      startBtn.style.fontSize = '16px';
+      startBtn.style.cursor = 'pointer';
+
+      startBtn.addEventListener('click', () => {
+        const minutes = parseInt(input.value, 10);
+        if (isNaN(minutes) || minutes <= 0) {
+          return;
+        }
+        if (mode === 'browse') {
+          const confirmation = prompt('Type "I am sure I am not procrastinating" to continue:');
+          if (confirmation !== 'I am sure I am not procrastinating') {
+            return;
+          }
+          const disabledUntil = Date.now() + minutes * 60 * 1000;
+          localStorage.setItem(DISABLED_UNTIL_KEY, String(disabledUntil));
+          overlay.remove();
+          resolve('browse');
+        } else {
+          overlay.remove();
+          resolve('study');
+        }
+      });
+
+      buttons.append(input, startBtn);
+    }
+
+    studyBtn.addEventListener('click', () => askDuration('study'));
+    browseBtn.addEventListener('click', () => askDuration('browse'));
+
+    (document.body || document.documentElement).appendChild(overlay);
+  });
+}
+
 // Function to check if we're on a YouTube watch page
 function isYouTubeWatchPage() {
   const currentUrl = window.location.href;
@@ -325,24 +416,17 @@ function main() {
   }
 }
 
-// Run the main function when the page is ready
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', main);
-} else {
-  main();
-}
-
 // Smart navigation monitoring - only triggers on actual video changes
 function setupSmartNavigationMonitoring() {
   // Remove existing listener to prevent duplicates
   if (navigateListener) {
     window.removeEventListener('yt-navigate-finish', navigateListener);
   }
-  
+
   // Only listen to YouTube's official navigation event
   navigateListener = () => {
     console.log('Studify: YouTube navigation detected');
-    
+
     // Small delay to ensure page is fully loaded
     setTimeout(() => {
       // Reset analysis flag for new video
@@ -350,11 +434,44 @@ function setupSmartNavigationMonitoring() {
       main();
     }, 1000);
   };
-  
+
   window.addEventListener('yt-navigate-finish', navigateListener);
 }
 
-// Set up navigation monitoring after initial page load
-setTimeout(() => {
-  setupSmartNavigationMonitoring();
-}, 3000);
+async function init() {
+  const disabledUntil = parseInt(localStorage.getItem(DISABLED_UNTIL_KEY) || '0', 10);
+  if (Date.now() < disabledUntil) {
+    const remaining = disabledUntil - Date.now();
+    console.log('Studify: Extension paused for browsing mode');
+    setTimeout(() => {
+      localStorage.removeItem(DISABLED_UNTIL_KEY);
+      window.location.reload();
+    }, remaining);
+    return;
+  }
+
+  const choice = await showPurposeOverlay();
+  if (choice === 'browse') {
+    const disabledUntilNew = parseInt(localStorage.getItem(DISABLED_UNTIL_KEY) || '0', 10);
+    const remaining = disabledUntilNew - Date.now();
+    if (remaining > 0) {
+      setTimeout(() => {
+        localStorage.removeItem(DISABLED_UNTIL_KEY);
+        window.location.reload();
+      }, remaining);
+    }
+    return;
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', main);
+  } else {
+    main();
+  }
+
+  setTimeout(() => {
+    setupSmartNavigationMonitoring();
+  }, 3000);
+}
+
+init();

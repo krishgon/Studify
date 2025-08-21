@@ -114,6 +114,7 @@ function showPurposeOverlay() {
         if (mode === 'browse') {
           const confirmation = document.getElementById('studify-confirm').value;
           if (confirmation !== 'I am sure I am not procrastinating') return;
+
           const disabledUntil = Date.now() + minutes * 60 * 1000;
           localStorage.setItem(DISABLED_UNTIL_KEY, String(disabledUntil));
           overlay.remove();
@@ -123,11 +124,13 @@ function showPurposeOverlay() {
           resolve('study');
         }
       });
+
     }
 
     overlay.querySelectorAll('.studify-btn').forEach((btn) => {
       btn.addEventListener('click', () => askDuration(btn.dataset.mode));
     });
+
 
     (document.body || document.documentElement).appendChild(overlay);
   });

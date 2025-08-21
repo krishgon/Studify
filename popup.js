@@ -2,21 +2,73 @@
 // Handles the popup interface and communicates with content scripts
 
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('Studify: Popup loaded');
-    
-    // Check if we're on a YouTube page
-    chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-        const currentTab = tabs[0];
-        const isYouTube = currentTab.url && currentTab.url.includes('youtube.com');
-        
-        updateStatus(isYouTube);
-    });
+    initPopup();
 });
 
-// Function to update the status display
+function initPopup() {
+    chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
+        const tab = tabs[0];
+        checkBrowsingMode(tab).then((state) => {
+            if (state && state.remainingMs > 0) {
+                renderInactiveWithTimer(state.remainingMs);
+            } else {
+                const isYouTube = tab.url && tab.url.includes('youtube.com');
+                updateStatus(isYouTube);
+            }
+        }).catch(() => {
+            const isYouTube = tab.url && tab.url.includes('youtube.com');
+            updateStatus(isYouTube);
+        });
+    });
+}
+
+// Detect if browsing mode is active. Prefer chrome.storage, fallback to page localStorage.
+function checkBrowsingMode(tab) {
+    return new Promise((resolve) => {
+        try {
+            chrome.storage.local.get(['studifyDisabledUntil'], (data) => {
+                const until = parseInt(data.studifyDisabledUntil || '0', 10);
+                const remaining = until - Date.now();
+                if (remaining > 0) {
+                    resolve({ remainingMs: remaining });
+                } else if (tab && tab.id && tab.url && tab.url.includes('youtube.com')) {
+                    // Fallback: read from the active YouTube tab's localStorage
+                    chrome.scripting.executeScript(
+                        {
+                            target: { tabId: tab.id },
+                            func: () => localStorage.getItem('studifyDisabledUntil')
+                        },
+                        (results) => {
+                            if (!results || !results[0] || chrome.runtime.lastError) {
+                                resolve(null);
+                                return;
+                            }
+                            const value = results[0].result;
+                            const until2 = parseInt(value || '0', 10);
+                            const rem2 = until2 - Date.now();
+                            if (rem2 > 0) {
+                                try {
+                                    chrome.storage.local.set({ studifyDisabledUntil: String(until2) });
+                                } catch (e) {}
+                                resolve({ remainingMs: rem2 });
+                            } else {
+                                resolve(null);
+                            }
+                        }
+                    );
+                } else {
+                    resolve(null);
+                }
+            });
+        } catch (e) {
+            resolve(null);
+        }
+    });
+}
+
+// Function to update the status display (used when not in browsing mode)
 function updateStatus(isYouTube) {
     const statusElement = document.getElementById('status');
-    
     if (isYouTube) {
         statusElement.className = 'status active';
         statusElement.innerHTML = `
@@ -32,11 +84,42 @@ function updateStatus(isYouTube) {
     }
 }
 
-// Function to get current tab info (for future use)
-function getCurrentTab() {
-    return new Promise((resolve) => {
-        chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
-            resolve(tabs[0]);
-        });
-    });
+function renderInactiveWithTimer(initialRemaining) {
+    const statusElement = document.getElementById('status');
+
+    function render(ms) {
+        statusElement.className = 'status inactive';
+        statusElement.innerHTML = `
+            <strong>🔴 Inactive</strong><br>
+            Browsing mode: ${formatRemaining(ms)} left
+        `;
+    }
+
+    let ms = initialRemaining;
+    render(ms);
+
+    const interval = setInterval(() => {
+        ms = Math.max(0, ms - 1000);
+        if (ms <= 0) {
+            clearInterval(interval);
+            try { chrome.storage.local.remove('studifyDisabledUntil'); } catch (e) {}
+            chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
+                const isYouTube = tabs[0].url && tabs[0].url.includes('youtube.com');
+                updateStatus(isYouTube);
+            });
+            return;
+        }
+        render(ms);
+    }, 1000);
+}
+
+function formatRemaining(ms) {
+    let total = Math.ceil(ms / 1000);
+    const h = Math.floor(total / 3600);
+    total = total % 3600;
+    const m = Math.floor(total / 60);
+    const s = total % 60;
+    if (h > 0) return `${h}h ${m}m ${s}s`;
+    if (m > 0) return `${m}m ${s}s`;
+    return `${s}s`;
 }

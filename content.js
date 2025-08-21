@@ -144,6 +144,11 @@ function showPurposeOverlay() {
           }
           const disabledUntil = Date.now() + minutes * 60 * 1000;
           localStorage.setItem(DISABLED_UNTIL_KEY, String(disabledUntil));
+          try {
+            if (chrome && chrome.storage && chrome.storage.local) {
+              chrome.storage.local.set({ [DISABLED_UNTIL_KEY]: String(disabledUntil) });
+            }
+          } catch (e) {}
           overlay.remove();
           resolve('browse');
         } else {
@@ -556,13 +561,29 @@ function setupSmartNavigationMonitoring() {
 async function init() {
   const disabledUntil = parseInt(localStorage.getItem(DISABLED_UNTIL_KEY) || '0', 10);
   if (Date.now() < disabledUntil) {
+    try {
+      if (chrome && chrome.storage && chrome.storage.local) {
+        chrome.storage.local.set({ [DISABLED_UNTIL_KEY]: String(disabledUntil) });
+      }
+    } catch (e) {}
     const remaining = disabledUntil - Date.now();
     console.log('Studify: Extension paused for browsing mode');
     setTimeout(() => {
+      try {
+        if (chrome && chrome.storage && chrome.storage.local) {
+          chrome.storage.local.remove(DISABLED_UNTIL_KEY);
+        }
+      } catch (e) {}
       localStorage.removeItem(DISABLED_UNTIL_KEY);
       window.location.reload();
     }, remaining);
     return;
+  } else {
+    try {
+      if (chrome && chrome.storage && chrome.storage.local) {
+        chrome.storage.local.remove(DISABLED_UNTIL_KEY);
+      }
+    } catch (e) {}
   }
 
   const studyUntil = parseInt(localStorage.getItem(STUDY_UNTIL_KEY) || '0', 10);
@@ -575,6 +596,11 @@ async function init() {
       const remaining = disabledUntilNew - Date.now();
       if (remaining > 0) {
         setTimeout(() => {
+          try {
+            if (chrome && chrome.storage && chrome.storage.local) {
+              chrome.storage.local.remove(DISABLED_UNTIL_KEY);
+            }
+          } catch (e) {}
           localStorage.removeItem(DISABLED_UNTIL_KEY);
           window.location.reload();
         }, remaining);

@@ -10,6 +10,7 @@ let isAnalyzing = false;
 
 const DISABLED_UNTIL_KEY = 'studifyDisabledUntil';
 const STUDY_UNTIL_KEY = 'studifyStudyUntil';
+const STUDIFY_LOGO_URL = chrome.runtime.getURL('icons/iconCirc128.png');
 
 // Prompt the user for their intent and duration before allowing YouTube access
 function showPurposeOverlay() {
@@ -18,6 +19,7 @@ function showPurposeOverlay() {
     overlay.id = 'studify-purpose-overlay';
     overlay.innerHTML = `
       <div class="studify-modal">
+        <img src="${STUDIFY_LOGO_URL}" alt="Studify logo" class="studify-logo" />
         <h1 class="studify-title">What brings you to YouTube?</h1>
         <div class="studify-choice">
           <button class="studify-btn" data-mode="study">Study</button>
@@ -47,6 +49,11 @@ function showPurposeOverlay() {
         text-align: center;
         max-width: 400px;
         width: 90%;
+      }
+      .studify-logo {
+        width: 80px;
+        height: 80px;
+        margin-bottom: 20px;
       }
       #studify-purpose-overlay h1 {
         margin: 0 0 20px;
@@ -119,6 +126,7 @@ function showPurposeOverlay() {
         .join('');
 
       modal.innerHTML = `
+        <img src="${STUDIFY_LOGO_URL}" alt="Studify logo" class="studify-logo" />
         <h1 class="studify-title">How long will you ${mode}?</h1>
         <div class="studify-inputs">
           <select id="studify-duration">${selectHtml}</select>
@@ -343,6 +351,7 @@ function blockPage() {
   document.body.innerHTML = `
     <div id="studify-block-page">
       <div class="studify-modal">
+        <img src="${STUDIFY_LOGO_URL}" alt="Studify logo" class="studify-logo" />
         <h1>Access Blocked</h1>
         <p>This YouTube video is not categorized as educational content.</p>
         <p>Studify only allows educational videos to help you stay focused on learning.</p>
@@ -371,6 +380,11 @@ function blockPage() {
       max-width: 480px;
       width: 90%;
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    }
+    .studify-logo {
+      width: 80px;
+      height: 80px;
+      margin-bottom: 20px;
     }
     #studify-block-page h1 {
       margin-bottom: 16px;
@@ -494,6 +508,7 @@ function blockShortsPage() {
   document.body.innerHTML = `
     <div id="studify-block-page">
       <div class="studify-modal">
+        <img src="${STUDIFY_LOGO_URL}" alt="Studify logo" class="studify-logo" />
         <h1>Shorts Blocked</h1>
         <p>Studify blocks YouTube Shorts to keep you focused.</p>
         <button id="studify-go-back-btn">Go Back</button>
@@ -520,6 +535,11 @@ function blockShortsPage() {
       max-width: 480px;
       width: 90%;
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    }
+    .studify-logo {
+      width: 80px;
+      height: 80px;
+      margin-bottom: 20px;
     }
     #studify-block-page h1 {
       margin-bottom: 16px;

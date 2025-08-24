@@ -11,12 +11,19 @@ const DEFAULT_BLOCKED_SITES = [
   'facebook.com'
 ];
 
-const USER_BLOCK_KEY = 'studifyUserBlockedSites';
-const STUDY_UNTIL_KEY = 'studifyStudyUntil';
+
 
 function shouldBlock(hostname, customSites) {
   const allSites = DEFAULT_BLOCKED_SITES.concat(customSites || []);
-  return allSites.some(site => hostname === site || hostname.endsWith('.' + site));
+  return allSites.some(site => {
+    // Exact match
+    if (hostname === site) return true;
+    // Subdomain match (e.g., www.youtube.com matches youtube.com)
+    if (hostname.endsWith('.' + site)) return true;
+    // Domain match (e.g., youtube.com matches www.youtube.com)
+    if (site.endsWith('.' + hostname)) return true;
+    return false;
+  });
 }
 
 function showBlockOverlay() {
@@ -48,11 +55,11 @@ function showBlockOverlay() {
 }
 
 function checkBlock() {
-  chrome.storage.local.get([STUDY_UNTIL_KEY, USER_BLOCK_KEY], data => {
-    const studyUntil = parseInt(data[STUDY_UNTIL_KEY] || '0', 10);
+  chrome.storage.local.get(['studifyStudyUntil', 'studifyUserBlockedSites'], data => {
+    const studyUntil = parseInt(data['studifyStudyUntil'] || '0', 10);
     if (Date.now() < studyUntil) {
       const hostname = window.location.hostname;
-      const customSites = data[USER_BLOCK_KEY] || [];
+      const customSites = data['studifyUserBlockedSites'] || [];
       if (shouldBlock(hostname, customSites)) {
         showBlockOverlay();
       }

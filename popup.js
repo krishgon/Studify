@@ -268,8 +268,15 @@ function loadBlockedSites() {
         list.forEach(site => {
             const li = document.createElement('li');
             const del = document.createElement('button');
-            del.textContent = '🗑️';
             del.className = 'delete-btn';
+            
+            // Create garbage icon
+            const deleteIcon = document.createElement('img');
+            deleteIcon.src = chrome.runtime.getURL('icons/delete.png');
+            deleteIcon.className = 'delete-icon';
+            deleteIcon.alt = 'Delete';
+            del.appendChild(deleteIcon);
+            
             del.addEventListener('click', () => removeBlockedSite(site));
             const span = document.createElement('span');
             span.textContent = site;

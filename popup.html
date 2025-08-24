@@ -87,37 +87,92 @@
 
         .blacklist-btn {
             width: 100%;
-            padding: 10px;
-            margin-bottom: 10px;
+            padding: 12px;
+            margin-bottom: 15px;
             background: var(--accent);
             color: var(--text);
             border: none;
-            border-radius: 6px;
+            border-radius: 8px;
             cursor: pointer;
+            font-weight: 500;
+            transition: background 0.2s;
+        }
+
+        .blacklist-btn:hover {
+            background: #4f46e5;
+        }
+
+        #blocked-websites {
+            background: var(--card-bg);
+            border: 1px solid #334155;
+            border-radius: 8px;
+            overflow: hidden;
         }
 
         #blocked-websites summary {
             cursor: pointer;
+            padding: 12px 15px;
+            background: #1e293b;
+            color: var(--text);
+            font-weight: 500;
+            border-bottom: 1px solid #334155;
+            transition: background 0.2s;
+        }
+
+        #blocked-websites summary:hover {
+            background: #334155;
         }
 
         #blocked-list {
             list-style: none;
             padding: 0;
-            margin: 5px 0 0 0;
+            margin: 0;
+            max-height: 200px;
+            overflow-y: auto;
         }
 
         #blocked-list li {
             display: flex;
             align-items: center;
-            gap: 8px;
-            padding: 4px 0;
+            justify-content: space-between;
+            padding: 12px 15px;
+            border-bottom: 1px solid #334155;
+            transition: background 0.2s;
+        }
+
+        #blocked-list li:last-child {
+            border-bottom: none;
+        }
+
+        #blocked-list li:hover {
+            background: #334155;
+        }
+
+        #blocked-list li.empty {
+            color: var(--muted);
+            font-style: italic;
+            justify-content: center;
         }
 
         #blocked-list button.delete-btn {
             background: none;
             border: none;
             cursor: pointer;
-            color: var(--danger);
+            padding: 6px;
+            border-radius: 4px;
+            transition: background 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #blocked-list button.delete-btn:hover {
+            background: rgba(239, 68, 68, 0.1);
+        }
+
+        #blocked-list .delete-icon {
+            width: 16px;
+            height: 16px;
         }
 
         .footer {

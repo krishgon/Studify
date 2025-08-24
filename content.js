@@ -180,6 +180,28 @@ function pauseAllVideos() {
   document.querySelectorAll('video').forEach((v) => v.pause());
 }
 
+// Remove the mode selection overlay if it exists
+function hidePurposeOverlay() {
+  const overlay = document.getElementById('studify-purpose-overlay');
+  if (overlay) overlay.remove();
+}
+
+// Listen for mode changes from other tabs
+window.addEventListener('storage', (e) => {
+  if (e.key === STUDY_UNTIL_KEY && e.newValue) {
+    // Another tab switched to study mode - return to the homepage
+    window.location.href = 'https://www.youtube.com';
+  } else if (e.key === DISABLED_UNTIL_KEY && e.newValue) {
+    // Another tab resumed browsing - dismiss the prompt and stay paused
+    hidePurposeOverlay();
+    pauseAllVideos();
+    const remaining = parseInt(e.newValue, 10) - Date.now();
+    if (remaining > 0) {
+      scheduleModePrompt(remaining, 'browse');
+    }
+  }
+});
+
 // Show the intent prompt again after a timer expires
 function scheduleModePrompt(remaining, mode) {
   setTimeout(async () => {

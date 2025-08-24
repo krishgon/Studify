@@ -727,4 +727,11 @@ async function init() {
   }
 }
 
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  if (request && request.action === 'switchToStudy') {
+    scheduleModePrompt(0, 'browse');
+    sendResponse({ status: 'ok' });
+  }
+});
+
 init();

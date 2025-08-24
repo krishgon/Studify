@@ -175,6 +175,46 @@ function showPurposeOverlay() {
   });
 }
 
+// Pause any playing videos on the page
+function pauseAllVideos() {
+  document.querySelectorAll('video').forEach((v) => v.pause());
+}
+
+// Show the intent prompt again after a timer expires
+function scheduleModePrompt(remaining, mode) {
+  setTimeout(async () => {
+    if (mode === 'browse') {
+      try {
+        if (chrome && chrome.storage && chrome.storage.local) {
+          chrome.storage.local.remove(DISABLED_UNTIL_KEY);
+        }
+      } catch (e) {}
+      localStorage.removeItem(DISABLED_UNTIL_KEY);
+    } else {
+      localStorage.removeItem(STUDY_UNTIL_KEY);
+    }
+
+    pauseAllVideos();
+    const choice = await showPurposeOverlay();
+
+    if (choice === 'browse') {
+      const disabledUntilNew = parseInt(localStorage.getItem(DISABLED_UNTIL_KEY) || '0', 10);
+      const remainingNew = disabledUntilNew - Date.now();
+      if (remainingNew > 0) {
+        scheduleModePrompt(remainingNew, 'browse');
+      }
+    } else {
+      const studyUntilNew = parseInt(localStorage.getItem(STUDY_UNTIL_KEY) || '0', 10);
+      const remainingStudyNew = studyUntilNew - Date.now();
+      if (mode === 'browse') {
+        window.location.href = 'https://www.youtube.com';
+      } else if (remainingStudyNew > 0) {
+        scheduleModePrompt(remainingStudyNew, 'study');
+      }
+    }
+  }, remaining);
+}
+
 // Function to check if we're on a YouTube watch page
 function isYouTubeWatchPage() {
   const currentUrl = window.location.href;
@@ -568,15 +608,7 @@ async function init() {
     } catch (e) {}
     const remaining = disabledUntil - Date.now();
     console.log('Studify: Extension paused for browsing mode');
-    setTimeout(() => {
-      try {
-        if (chrome && chrome.storage && chrome.storage.local) {
-          chrome.storage.local.remove(DISABLED_UNTIL_KEY);
-        }
-      } catch (e) {}
-      localStorage.removeItem(DISABLED_UNTIL_KEY);
-      window.location.reload();
-    }, remaining);
+    scheduleModePrompt(remaining, 'browse');
     return;
   } else {
     try {
@@ -595,15 +627,7 @@ async function init() {
       const disabledUntilNew = parseInt(localStorage.getItem(DISABLED_UNTIL_KEY) || '0', 10);
       const remaining = disabledUntilNew - Date.now();
       if (remaining > 0) {
-        setTimeout(() => {
-          try {
-            if (chrome && chrome.storage && chrome.storage.local) {
-              chrome.storage.local.remove(DISABLED_UNTIL_KEY);
-            }
-          } catch (e) {}
-          localStorage.removeItem(DISABLED_UNTIL_KEY);
-          window.location.reload();
-        }, remaining);
+        scheduleModePrompt(remaining, 'browse');
       }
       return;
     }
@@ -624,10 +648,7 @@ async function init() {
   }, 3000);
 
   if (remainingStudy > 0) {
-    setTimeout(() => {
-      localStorage.removeItem(STUDY_UNTIL_KEY);
-      window.location.reload();
-    }, remainingStudy);
+    scheduleModePrompt(remainingStudy, 'study');
   }
 }
 

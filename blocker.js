@@ -68,3 +68,19 @@ function checkBlock() {
 }
 
 checkBlock();
+
+// Reload blocked sites when study mode starts
+chrome.storage.onChanged.addListener((changes, area) => {
+  if (area === 'local' && changes['studifyStudyUntil']) {
+    const newUntil = parseInt(changes['studifyStudyUntil'].newValue || '0', 10);
+    if (Date.now() < newUntil) {
+      chrome.storage.local.get(['studifyUserBlockedSites'], data => {
+        const hostname = window.location.hostname;
+        const customSites = data['studifyUserBlockedSites'] || [];
+        if (shouldBlock(hostname, customSites)) {
+          location.reload();
+        }
+      });
+    }
+  }
+});

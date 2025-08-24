@@ -106,6 +106,13 @@ function showPurposeOverlay() {
         transition: background 0.2s;
       }
       .studify-start-btn:hover { background: #4f46e5; }
+      .studify-info {
+        color: #6b7280;
+        font-size: 14px;
+        margin-top: 12px;
+        line-height: 1.4;
+        font-style: italic;
+      }
     `;
     overlay.appendChild(style);
 
@@ -127,14 +134,16 @@ function showPurposeOverlay() {
 
       modal.innerHTML = `
         <img src="${STUDIFY_LOGO_URL}" alt="Studify logo" class="studify-logo" />
-        <h1 class="studify-title">How long will you ${mode}?</h1>
+        <h1 class="studify-title">${mode === 'study' ? 'Make a time commitment to study' : 'How long will you browse?'}</h1>
         <div class="studify-inputs">
           <select id="studify-duration">${selectHtml}</select>
           ${mode === 'browse'
-            ? '<input id="studify-confirm" type="text" placeholder="Type: I am sure I am not procrastinating">'
+            ? `<div style="font-size:16px; text-align:left; user-select:none; -webkit-user-select:none; -ms-user-select:none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent;">Type: <b>I am sure I am not procrastinating</b></div>
+               <input id="studify-confirm" type="text">`
             : ''}
           <button class="studify-start-btn">Start</button>
           <div class="studify-error" style="display:none;">Incorrect confirmation phrase</div>
+          ${mode === 'study' ? '<div class="studify-info">You won\'t be able to switch to browse mode until your study session ends.</div>' : ''}
         </div>
       `;
 

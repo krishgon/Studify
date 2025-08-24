@@ -141,7 +141,7 @@ function showPurposeOverlay(initialMode) {
           <select id="studify-duration">${selectHtml}</select>
           ${mode === 'browse'
             ? `<div style="font-size:16px; text-align:left; user-select:none; -webkit-user-select:none; -ms-user-select:none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent;">Type: <b>I am sure I am not procrastinating</b></div>
-               <input id="studify-confirm" type="text">`
+               <input id="studify-confirm" type="text" autocomplete="off" data-form-type="other" data-lpignore="true" spellcheck="false">`
             : ''}
           <button class="studify-start-btn">Start</button>
           <div class="studify-error" style="display:none;">Incorrect confirmation phrase</div>

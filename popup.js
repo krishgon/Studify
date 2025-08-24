@@ -13,7 +13,7 @@ function initPopup() {
         const tab = tabs[0];
         checkBrowsingMode(tab).then((state) => {
             if (state && state.remainingMs > 0) {
-                renderInactiveWithTimer(state.remainingMs);
+                renderInactiveWithTimer(state.remainingMs, tab.id);
                 hideBlacklistSection();
             } else {
                 checkStudyMode(tab).then((studyState) => {

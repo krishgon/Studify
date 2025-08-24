@@ -1,7 +1,7 @@
 // Studify Content Script
 // This script runs on YouTube pages to filter content based on video category
 
-console.log('Studify: Content script loaded');
+// console.log('Studify: Content script loaded');
 
 // Keep references to observers and listeners to avoid duplicates
 let navigateListener = null;
@@ -274,8 +274,8 @@ function scheduleModePrompt(remaining, mode) {
 function isYouTubeWatchPage() {
   const currentUrl = window.location.href;
   const isWatchPage = currentUrl.includes('/watch?v=');
-  console.log('Studify: Current URL:', currentUrl);
-  console.log('Studify: Is watch page:', isWatchPage);
+  // console.log('Studify: Current URL:', currentUrl);
+  // console.log('Studify: Is watch page:', isWatchPage);
   return isWatchPage;
 }
 
@@ -290,7 +290,7 @@ function getCurrentVideoId() {
 function getVideoCategory() {
   const genreMeta = document.querySelector('meta[itemprop="genre"]');
   if (genreMeta) {
-    console.log("from the meta tag");
+    // console.log("from the meta tag");
     return genreMeta.getAttribute('content');
   }
 
@@ -308,7 +308,7 @@ function getVideoCategory() {
         window.ytplayer.config.args.raw_player_response
       );
     } catch (e) {
-      console.error('Studify: Failed to parse raw_player_response', e);
+      // console.error('Studify: Failed to parse raw_player_response', e);
     }
   }
 
@@ -339,7 +339,7 @@ async function fetchCategoryFromOriginalHTML() {
       const tag = metaMatch[0];
       const contentMatch = tag.match(/content=(['"])(.*?)\1/i);
       if (contentMatch) {
-        console.log('Studify: Category from original HTML meta tag');
+        // console.log('Studify: Category from original HTML meta tag');
         return contentMatch[2];
       }
     }
@@ -354,24 +354,24 @@ async function fetchCategoryFromOriginalHTML() {
       } catch (e) {}
     }
   } catch (e) {
-    console.error('Studify: Failed to fetch original HTML', e);
+    // console.error('Studify: Failed to fetch original HTML', e);
   }
   return null;
 }
 
 async function isEducationalVideo() {
-  console.log('Studify: Checking video category...');
+  // console.log('Studify: Checking video category...');
   let category = getVideoCategory();
   if (!category) {
     category = await fetchCategoryFromOriginalHTML();
   }
-  console.log('Studify: Detected category:', category);
+  // console.log('Studify: Detected category:', category);
   return category === 'Education';
 }
 
 // Function to block the page if video is not educational
 function blockPage() {
-  console.log('Studify: Blocking non-educational content');
+  // console.log('Studify: Blocking non-educational content');
 
   document.body.innerHTML = `
     <div id="studify-block-page">
@@ -596,7 +596,7 @@ function blockShortsPage() {
 
 // Main function to run when page loads
 function main() {
-  console.log('Studify: Starting content analysis...');
+  // console.log('Studify: Starting content analysis...');
 
   // Always hide Shorts UI elements site-wide
   enableShortsHider();
@@ -616,30 +616,30 @@ function main() {
     if (videoId && videoId !== currentVideoId && !isAnalyzing) {
       currentVideoId = videoId;
       isAnalyzing = true;
-      console.log('Studify: New video detected - analyzing content...');
+      // console.log('Studify: New video detected - analyzing content...');
       
       // Wait a bit for YouTube to fully load
       setTimeout(async () => {
         if (!(await isEducationalVideo())) {
           blockPage();
         } else {
-          console.log('Studify: Educational content detected - allowing access');
+          // console.log('Studify: Educational content detected - allowing access');
         }
         isAnalyzing = false;
       }, 2000);
     } else if (videoId === currentVideoId) {
-      console.log('Studify: Same video, skipping analysis');
+      // console.log('Studify: Same video, skipping analysis');
     } else if (!videoId) {
-      console.log('Studify: No video ID found');
+      // console.log('Studify: No video ID found');
     }
   } else if (isYouTubeHomePage()) {
     hideHomeFeed();
     showWatchSidebar();
-    console.log('Studify: Home page detected - hiding feed');
+    // console.log('Studify: Home page detected - hiding feed');
   } else {
     showHomeFeed();
     showWatchSidebar();
-    console.log('Studify: Not a watch page - allowing access to YouTube');
+    // console.log('Studify: Not a watch page - allowing access to YouTube');
   }
 }
 
@@ -652,7 +652,7 @@ function setupSmartNavigationMonitoring() {
 
   // Only listen to YouTube's official navigation event
   navigateListener = () => {
-    console.log('Studify: YouTube navigation detected');
+    // console.log('Studify: YouTube navigation detected');
 
     // Small delay to ensure page is fully loaded
     setTimeout(() => {
@@ -674,7 +674,7 @@ async function init() {
       }
     } catch (e) {}
     const remaining = disabledUntil - Date.now();
-    console.log('Studify: Extension paused for browsing mode');
+    // console.log('Studify: Extension paused for browsing mode');
     scheduleModePrompt(remaining, 'browse');
     return;
   } else {

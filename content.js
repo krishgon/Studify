@@ -134,13 +134,29 @@ function showPurposeOverlay(initialMode) {
         .map((m) => `<option value="${m}">${formatLabel(m)}</option>`)
         .join('');
 
+      // Generate random confirmation phrase
+      const confirmationPhrases = [
+        "I am sure I am not procrastinating",
+        "I am confident this is not procrastination",
+        "I am certain this browsing is necessary",
+        "I am positive this is not time wasting",
+        "I am convinced this is productive browsing",
+        "I am assured this is not procrastination",
+        "I am definite this browsing is justified",
+        "I am clear this is not procrastination",
+        "I am certain this is necessary browsing",
+        "I am confident this is not time wasting"
+      ];
+      
+      const randomPhrase = confirmationPhrases[Math.floor(Math.random() * confirmationPhrases.length)];
+
       modal.innerHTML = `
         <img src="${STUDIFY_LOGO_URL}" alt="Studify logo" class="studify-logo" />
         <h1 class="studify-title">${mode === 'study' ? 'Make a time commitment to study' : 'How long will you browse?'}</h1>
         <div class="studify-inputs">
           <select id="studify-duration">${selectHtml}</select>
           ${mode === 'browse'
-            ? `<div style="font-size:16px; text-align:left; user-select:none; -webkit-user-select:none; -ms-user-select:none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent;">Type: <b>I am sure I am not procrastinating</b></div>
+            ? `<div style="font-size:16px; text-align:left; user-select:none; -webkit-user-select:none; -ms-user-select:none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent;">Type: <b>${randomPhrase}</b></div>
                <input id="studify-confirm" type="text" autocomplete="off" data-form-type="other" data-lpignore="true" spellcheck="false">`
             : ''}
           <button class="studify-start-btn">Start</button>
@@ -157,7 +173,7 @@ function showPurposeOverlay(initialMode) {
         if (isNaN(minutes) || minutes <= 0) return;
         if (mode === 'browse') {
           const confirmation = document.getElementById('studify-confirm').value.trim();
-          if (confirmation !== 'I am sure I am not procrastinating') {
+          if (confirmation !== randomPhrase) {
             errorEl.style.display = 'block';
             return;
           }

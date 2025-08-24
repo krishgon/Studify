@@ -154,6 +154,11 @@ function showPurposeOverlay() {
         } else {
           const studyUntil = Date.now() + minutes * 60 * 1000;
           localStorage.setItem(STUDY_UNTIL_KEY, String(studyUntil));
+          try {
+            if (chrome && chrome.storage && chrome.storage.local) {
+              chrome.storage.local.set({ [STUDY_UNTIL_KEY]: String(studyUntil) });
+            }
+          } catch (e) {}
           overlay.remove();
           resolve('study');
         }
@@ -214,6 +219,11 @@ function scheduleModePrompt(remaining, mode) {
       localStorage.removeItem(DISABLED_UNTIL_KEY);
     } else {
       localStorage.removeItem(STUDY_UNTIL_KEY);
+      try {
+        if (chrome && chrome.storage && chrome.storage.local) {
+          chrome.storage.local.remove(STUDY_UNTIL_KEY);
+        }
+      } catch (e) {}
     }
 
     pauseAllVideos();
@@ -642,6 +652,20 @@ async function init() {
 
   const studyUntil = parseInt(localStorage.getItem(STUDY_UNTIL_KEY) || '0', 10);
   let inStudy = Date.now() < studyUntil;
+
+  if (inStudy) {
+    try {
+      if (chrome && chrome.storage && chrome.storage.local) {
+        chrome.storage.local.set({ [STUDY_UNTIL_KEY]: String(studyUntil) });
+      }
+    } catch (e) {}
+  } else {
+    try {
+      if (chrome && chrome.storage && chrome.storage.local) {
+        chrome.storage.local.remove(STUDY_UNTIL_KEY);
+      }
+    } catch (e) {}
+  }
 
   if (!inStudy) {
     const choice = await showPurposeOverlay();

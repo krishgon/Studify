@@ -81,6 +81,45 @@
             line-height: 1.4;
         }
 
+        .blacklist {
+            margin-top: 20px;
+        }
+
+        .blacklist-btn {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            background: var(--accent);
+            color: var(--text);
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        #blocked-websites summary {
+            cursor: pointer;
+        }
+
+        #blocked-list {
+            list-style: none;
+            padding: 0;
+            margin: 5px 0 0 0;
+        }
+
+        #blocked-list li {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 4px 0;
+        }
+
+        #blocked-list button.delete-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--danger);
+        }
+
         .footer {
             text-align: center;
             margin-top: 20px;
@@ -108,7 +147,17 @@
         • Removes distractive UI elements<br>
         • Helps you stay focused on learning
     </div>
-    
+
+    <div class="blacklist" id="blacklist-section" style="display:none;">
+        <button id="add-blacklist" class="blacklist-btn">Add this website to blacklist</button>
+        <details id="blocked-websites">
+            <summary>Blocked websites</summary>
+            <ul id="blocked-list">
+                <li class="empty">No websites added</li>
+            </ul>
+        </details>
+    </div>
+
     <div class="footer">
         Version 1.0.0<br>
         Made with ❤️ for students by a student

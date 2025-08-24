@@ -6,15 +6,21 @@
   "permissions": [
     "activeTab",
     "scripting",
-    "storage"
+    "storage",
+    "tabs"
   ],
   "host_permissions": [
-    "https://www.youtube.com/*"
+    "<all_urls>"
   ],
   "content_scripts": [
     {
       "matches": ["https://www.youtube.com/*"],
       "js": ["content.js"],
+      "run_at": "document_start"
+    },
+    {
+      "matches": ["<all_urls>"],
+      "js": ["blocker.js"],
       "run_at": "document_start"
     }
   ],

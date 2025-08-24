@@ -238,7 +238,16 @@ function addCurrentSiteToBlacklist() {
             const list = data[USER_BLOCK_KEY];
             if (!list.includes(hostname)) {
                 list.push(hostname);
-                chrome.storage.local.set({ [USER_BLOCK_KEY]: list }, loadBlockedSites);
+                chrome.storage.local.set({ [USER_BLOCK_KEY]: list }, () => {
+                    // Reload the current tab after adding to blacklist
+                    chrome.tabs.reload(tabs[0].id);
+                    // Close the popup
+                    window.close();
+                });
+            } else {
+                // If already in blacklist, just reload the page
+                chrome.tabs.reload(tabs[0].id);
+                window.close();
             }
         });
     });

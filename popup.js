@@ -234,6 +234,13 @@ function addCurrentSiteToBlacklist() {
         } catch (e) {
             return;
         }
+        
+        // Prevent YouTube from being added to blacklist
+        if (hostname === 'youtube.com' || hostname === 'www.youtube.com' || hostname.endsWith('.youtube.com')) {
+            // Show error message or just return without doing anything
+            return;
+        }
+        
         chrome.storage.local.get({ [USER_BLOCK_KEY]: [] }, (data) => {
             const list = data[USER_BLOCK_KEY];
             if (!list.includes(hostname)) {

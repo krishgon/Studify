@@ -144,19 +144,28 @@ function updateStatus(isYouTube) {
     }
 }
 
-function renderInactiveWithTimer(initialRemaining) {
+function renderInactiveWithTimer(initialRemaining, tabId) {
     const statusElement = document.getElementById('status');
+    statusElement.className = 'status inactive';
+    statusElement.innerHTML = `
+        <strong>🔴 Inactive</strong><br>
+        Browsing mode: <span id="studify-remaining"></span><br>
+        <button id="studify-switch-btn" class="mode-btn">Switch to Study Mode</button>
+    `;
 
-    function render(ms) {
-        statusElement.className = 'status inactive';
-        statusElement.innerHTML = `
-            <strong>🔴 Inactive</strong><br>
-            Browsing mode: ${formatRemaining(ms)} left
-        `;
-    }
+    const remainingEl = document.getElementById('studify-remaining');
+    const switchBtn = document.getElementById('studify-switch-btn');
+
+    switchBtn.addEventListener('click', () => {
+        chrome.tabs.sendMessage(tabId, { action: 'switchToStudy' });
+        window.close();
+    });
 
     let ms = initialRemaining;
-    render(ms);
+    function update() {
+        remainingEl.textContent = formatRemaining(ms);
+    }
+    update();
 
     const interval = setInterval(() => {
         ms = Math.max(0, ms - 1000);
@@ -169,7 +178,7 @@ function renderInactiveWithTimer(initialRemaining) {
             });
             return;
         }
-        render(ms);
+        update();
     }, 1000);
 }
 

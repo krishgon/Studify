@@ -18,6 +18,12 @@
       "run_at": "document_start"
     }
   ],
+  "web_accessible_resources": [
+    {
+      "resources": ["icons/*"],
+      "matches": ["https://www.youtube.com/*"]
+    }
+  ],
   "action": {
     "default_popup": "popup.html",
     "default_title": "Studify - Mindful YouTube for Study & Focus"

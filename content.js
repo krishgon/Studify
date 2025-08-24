@@ -10,6 +10,7 @@ let isAnalyzing = false;
 
 const DISABLED_UNTIL_KEY = 'studifyDisabledUntil';
 const STUDY_UNTIL_KEY = 'studifyStudyUntil';
+const STUDIFY_LOGO_URL = chrome.runtime.getURL('icons/iconCirc128.png');
 
 // Prompt the user for their intent and duration before allowing YouTube access
 function showPurposeOverlay() {
@@ -18,6 +19,7 @@ function showPurposeOverlay() {
     overlay.id = 'studify-purpose-overlay';
     overlay.innerHTML = `
       <div class="studify-modal">
+        <img src="${STUDIFY_LOGO_URL}" alt="Studify logo" class="studify-logo" />
         <h1 class="studify-title">What brings you to YouTube?</h1>
         <div class="studify-choice">
           <button class="studify-btn" data-mode="study">Study</button>
@@ -47,6 +49,11 @@ function showPurposeOverlay() {
         text-align: center;
         max-width: 400px;
         width: 90%;
+      }
+      .studify-logo {
+        width: 80px;
+        height: 80px;
+        margin-bottom: 20px;
       }
       #studify-purpose-overlay h1 {
         margin: 0 0 20px;
@@ -99,6 +106,13 @@ function showPurposeOverlay() {
         transition: background 0.2s;
       }
       .studify-start-btn:hover { background: #4f46e5; }
+      .studify-info {
+        color: #6b7280;
+        font-size: 14px;
+        margin-top: 12px;
+        line-height: 1.4;
+        font-style: italic;
+      }
     `;
     overlay.appendChild(style);
 
@@ -119,14 +133,17 @@ function showPurposeOverlay() {
         .join('');
 
       modal.innerHTML = `
-        <h1 class="studify-title">How long will you ${mode}?</h1>
+        <img src="${STUDIFY_LOGO_URL}" alt="Studify logo" class="studify-logo" />
+        <h1 class="studify-title">${mode === 'study' ? 'Make a time commitment to study' : 'How long will you browse?'}</h1>
         <div class="studify-inputs">
           <select id="studify-duration">${selectHtml}</select>
           ${mode === 'browse'
-            ? '<input id="studify-confirm" type="text" placeholder="Type: I am sure I am not procrastinating">'
+            ? `<div style="font-size:16px; text-align:left; user-select:none; -webkit-user-select:none; -ms-user-select:none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent;">Type: <b>I am sure I am not procrastinating</b></div>
+               <input id="studify-confirm" type="text">`
             : ''}
           <button class="studify-start-btn">Start</button>
           <div class="studify-error" style="display:none;">Incorrect confirmation phrase</div>
+          ${mode === 'study' ? '<div class="studify-info">You won\'t be able to switch to browse mode until your study session ends.</div>' : ''}
         </div>
       `;
 
@@ -353,6 +370,7 @@ function blockPage() {
   document.body.innerHTML = `
     <div id="studify-block-page">
       <div class="studify-modal">
+        <img src="${STUDIFY_LOGO_URL}" alt="Studify logo" class="studify-logo" />
         <h1>Access Blocked</h1>
         <p>This YouTube video is not categorized as educational content.</p>
         <p>Studify only allows educational videos to help you stay focused on learning.</p>
@@ -381,6 +399,11 @@ function blockPage() {
       max-width: 480px;
       width: 90%;
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    }
+    .studify-logo {
+      width: 80px;
+      height: 80px;
+      margin-bottom: 20px;
     }
     #studify-block-page h1 {
       margin-bottom: 16px;
@@ -504,6 +527,7 @@ function blockShortsPage() {
   document.body.innerHTML = `
     <div id="studify-block-page">
       <div class="studify-modal">
+        <img src="${STUDIFY_LOGO_URL}" alt="Studify logo" class="studify-logo" />
         <h1>Shorts Blocked</h1>
         <p>Studify blocks YouTube Shorts to keep you focused.</p>
         <button id="studify-go-back-btn">Go Back</button>
@@ -530,6 +554,11 @@ function blockShortsPage() {
       max-width: 480px;
       width: 90%;
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    }
+    .studify-logo {
+      width: 80px;
+      height: 80px;
+      margin-bottom: 20px;
     }
     #studify-block-page h1 {
       margin-bottom: 16px;

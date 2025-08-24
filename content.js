@@ -13,7 +13,9 @@ const STUDY_UNTIL_KEY = 'studifyStudyUntil';
 const STUDIFY_LOGO_URL = chrome.runtime.getURL('icons/iconCirc128.png');
 
 // Prompt the user for their intent and duration before allowing YouTube access
-function showPurposeOverlay() {
+// If an initial mode is provided, skip the mode selection prompt and go
+// straight to the duration screen for that mode.
+function showPurposeOverlay(initialMode) {
   return new Promise((resolve) => {
     const overlay = document.createElement('div');
     overlay.id = 'studify-purpose-overlay';
@@ -189,9 +191,13 @@ function showPurposeOverlay() {
       }
     }
 
-    overlay.querySelectorAll('.studify-btn').forEach((btn) => {
-      btn.addEventListener('click', () => askDuration(btn.dataset.mode));
-    });
+    if (!initialMode) {
+      overlay.querySelectorAll('.studify-btn').forEach((btn) => {
+        btn.addEventListener('click', () => askDuration(btn.dataset.mode));
+      });
+    } else {
+      askDuration(initialMode);
+    }
 
     (document.body || document.documentElement).appendChild(overlay);
   });
@@ -729,7 +735,21 @@ async function init() {
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request && request.action === 'switchToStudy') {
-    scheduleModePrompt(0, 'browse');
+    try {
+      if (chrome && chrome.storage && chrome.storage.local) {
+        chrome.storage.local.remove(DISABLED_UNTIL_KEY);
+      }
+    } catch (e) {}
+    localStorage.removeItem(DISABLED_UNTIL_KEY);
+    pauseAllVideos();
+    showPurposeOverlay('study').then(() => {
+      const studyUntilNew = parseInt(localStorage.getItem(STUDY_UNTIL_KEY) || '0', 10);
+      const remainingStudyNew = studyUntilNew - Date.now();
+      window.location.href = 'https://www.youtube.com';
+      if (remainingStudyNew > 0) {
+        scheduleModePrompt(remainingStudyNew, 'study');
+      }
+    });
     sendResponse({ status: 'ok' });
   }
 });

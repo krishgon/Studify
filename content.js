@@ -173,7 +173,7 @@ function showPurposeOverlay(initialMode) {
         if (isNaN(minutes) || minutes <= 0) return;
         if (mode === 'browse') {
           const confirmation = document.getElementById('studify-confirm').value.trim();
-          if (confirmation !== randomPhrase) {
+          if (confirmation.toLowerCase() !== randomPhrase.toLowerCase()) {
             errorEl.style.display = 'block';
             return;
           }

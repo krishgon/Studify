@@ -10,6 +10,7 @@ let isAnalyzing = false;
 
 const DISABLED_UNTIL_KEY = 'studifyDisabledUntil';
 const STUDY_UNTIL_KEY = 'studifyStudyUntil';
+const WHITELIST_KEY = 'studifyWhitelistedChannels';
 const STUDIFY_LOGO_URL = chrome.runtime.getURL('icons/iconCirc128.png');
 
 // Prompt the user for their intent and duration before allowing YouTube access
@@ -302,6 +303,80 @@ function getCurrentVideoId() {
 }
 
 
+// Get the current video's channel ID and name from the player response
+function getVideoChannelInfo() {
+  let playerResponse = window.ytInitialPlayerResponse;
+
+  if (!playerResponse &&
+      window.ytplayer &&
+      window.ytplayer.config &&
+      window.ytplayer.config.args &&
+      window.ytplayer.config.args.raw_player_response) {
+    try {
+      playerResponse = JSON.parse(
+        window.ytplayer.config.args.raw_player_response
+      );
+    } catch (e) {}
+  }
+
+  if (playerResponse && playerResponse.videoDetails) {
+    return {
+      channelId: playerResponse.videoDetails.channelId || null,
+      channelName: playerResponse.videoDetails.author || null
+    };
+  }
+
+  return { channelId: null, channelName: null };
+}
+
+// Retrieve the list of whitelisted channel IDs
+function getWhitelistedChannels() {
+  return new Promise((resolve) => {
+    try {
+      if (chrome && chrome.storage && chrome.storage.local) {
+        chrome.storage.local.get([WHITELIST_KEY], data => {
+          resolve(data[WHITELIST_KEY] || []);
+        });
+        return;
+      }
+    } catch (e) {}
+
+    try {
+      const list = JSON.parse(localStorage.getItem(WHITELIST_KEY) || '[]');
+      resolve(list);
+    } catch (e) {
+      resolve([]);
+    }
+  });
+}
+
+// Check if a channel is already whitelisted
+async function isChannelWhitelisted(channelId) {
+  if (!channelId) return false;
+  const list = await getWhitelistedChannels();
+  return list.includes(channelId);
+}
+
+// Add a channel to the whitelist and reload the page
+function addChannelToWhitelist(channelId) {
+  if (!channelId) return;
+  getWhitelistedChannels().then(list => {
+    if (!list.includes(channelId)) {
+      list.push(channelId);
+      try {
+        if (chrome && chrome.storage && chrome.storage.local) {
+          chrome.storage.local.set({ [WHITELIST_KEY]: list });
+        }
+      } catch (e) {}
+      try {
+        localStorage.setItem(WHITELIST_KEY, JSON.stringify(list));
+      } catch (e) {}
+    }
+    window.location.reload();
+  });
+}
+
+
 // Retrieve the current video's category using multiple fallbacks
 function getVideoCategory() {
   const genreMeta = document.querySelector('meta[itemprop="genre"]');
@@ -386,7 +461,7 @@ async function isEducationalVideo() {
 }
 
 // Function to block the page if video is not educational
-function blockPage() {
+function blockPage(channelId, channelName) {
   // console.log('Studify: Blocking non-educational content');
 
   document.body.innerHTML = `
@@ -397,6 +472,7 @@ function blockPage() {
         <p>This YouTube video is not categorized as educational content.</p>
         <p>Studify only allows educational videos to help you stay focused on learning.</p>
         <button id="studify-go-back-btn">Go Back</button>
+        <button id="studify-unblock-btn">Think this is a mistake? Unblock ${channelName ? channelName : 'this channel'}</button>
       </div>
     </div>
   `;
@@ -447,12 +523,29 @@ function blockPage() {
       transition: background 0.2s;
     }
     #studify-go-back-btn:hover { background: #2563eb; }
+    #studify-unblock-btn {
+      margin-top: 12px;
+      padding: 8px 16px;
+      border: none;
+      border-radius: 8px;
+      background: #22c55e;
+      color: #ffffff;
+      font-size: 14px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    #studify-unblock-btn:hover { background: #16a34a; }
   `;
   document.head.appendChild(style);
 
   const btn = document.getElementById('studify-go-back-btn');
   if (btn) {
     btn.addEventListener('click', goBack, { once: true });
+  }
+
+  const unblockBtn = document.getElementById('studify-unblock-btn');
+  if (unblockBtn) {
+    unblockBtn.addEventListener('click', () => addChannelToWhitelist(channelId), { once: true });
   }
 }
 
@@ -636,8 +729,13 @@ function main() {
       
       // Wait a bit for YouTube to fully load
       setTimeout(async () => {
-        if (!(await isEducationalVideo())) {
-          blockPage();
+        const { channelId, channelName } = getVideoChannelInfo();
+        const educational = await isEducationalVideo();
+        if (!educational) {
+          const whitelisted = await isChannelWhitelisted(channelId);
+          if (!whitelisted) {
+            blockPage(channelId, channelName);
+          }
         } else {
           // console.log('Studify: Educational content detected - allowing access');
         }

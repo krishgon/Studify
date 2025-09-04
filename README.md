@@ -13,6 +13,7 @@ Studify helps students stay focused on learning by automatically filtering YouTu
 - **User-Friendly Blocking**: Clean, informative blocking page with navigation options
 - **Real-Time Status**: Popup interface showing extension status
 - **Intent Check**: Full‑screen prompt when opening YouTube asks whether you're studying or browsing and for how long (using preset durations). Browsing requires typing *"I am sure I am not procrastinating"* and temporarily disables filtering, while study sessions persist for the chosen time even across reloads.
+- **Channel Whitelist**: If a video is miscategorized, quickly whitelist its channel from the block screen and continue watching.
 
 ## 📁 File Structure
 
@@ -53,7 +54,7 @@ studify/
 
 ## 🔮 Future Enhancements
 
-- [ ] Add whitelist/blacklist functionality
+- [ ] Add blacklist functionality
 - [ ] Create settings page for user preferences
 - [ ] Add statistics and usage tracking
 - [ ] Support for other educational platforms

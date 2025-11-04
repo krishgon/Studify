@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Studify - Mindful YouTube for Study & Focus",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Block distracting YouTube content. Switch between Study Mode and Browse Mode for mindful, focused viewing.",
   "permissions": [
     "activeTab",

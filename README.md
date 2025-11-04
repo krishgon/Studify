@@ -14,18 +14,6 @@ Studify helps students stay focused on learning by reducing distractions on YouT
 - **Real-Time Status**: Popup interface showing extension status
 - **Intent Check**: Full‑screen prompt when opening YouTube asks whether you're studying or browsing and for how long (using preset durations). Browsing temporarily disables the prompt; study sessions persist for the chosen time even across reloads.
 
-## 📁 File Structure
-
-```
-studify/
-├── manifest.json      # Extension configuration
-├── content.js         # Main content script (Shorts blocking, hide feeds/sidebar, intent prompt)
-├── popup.html         # Extension popup interface
-├── popup.js           # Popup logic and status updates
-├── icons/             # Extension icons (16x16, 48x48, 128x128)
-└── README.md          # This file
-```
-
 ## 🔧 Installation (Development)
 
 1. **Clone the repository**

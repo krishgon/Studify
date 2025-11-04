@@ -167,6 +167,18 @@ function showPurposeOverlay(initialMode) {
 
       const errorEl = modal.querySelector('.studify-error');
       const startBtn = modal.querySelector('.studify-start-btn');
+      // Allow pressing Enter in browse confirmation input to start
+      if (mode === 'browse') {
+        const confirmInput = document.getElementById('studify-confirm');
+        if (confirmInput && startBtn) {
+          confirmInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+              e.preventDefault();
+              startBtn.click();
+            }
+          });
+        }
+      }
       startBtn.addEventListener('click', () => {
         errorEl.style.display = 'none';
         const minutes = parseInt(document.getElementById('studify-duration').value, 10);

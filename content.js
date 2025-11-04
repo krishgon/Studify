@@ -637,29 +637,8 @@ function main() {
 
   // Only run content filtering on YouTube watch pages
   if (isYouTubeWatchPage()) {
-    const videoId = getCurrentVideoId();
+    // Keep distraction-hiding behavior, but remove category-based blocking
     hideWatchSidebar();
-    
-    // Only analyze if this is a new video and we're not already analyzing
-    if (videoId && videoId !== currentVideoId && !isAnalyzing) {
-      currentVideoId = videoId;
-      isAnalyzing = true;
-      // console.log('Studify: New video detected - analyzing content...');
-      
-      // Wait a bit for YouTube to fully load
-      setTimeout(async () => {
-        if (!(await isEducationalVideo())) {
-          blockPage();
-        } else {
-          // console.log('Studify: Educational content detected - allowing access');
-        }
-        isAnalyzing = false;
-      }, 2000);
-    } else if (videoId === currentVideoId) {
-      // console.log('Studify: Same video, skipping analysis');
-    } else if (!videoId) {
-      // console.log('Studify: No video ID found');
-    }
   } else if (isYouTubeHomePage()) {
     hideHomeFeed();
     showWatchSidebar();

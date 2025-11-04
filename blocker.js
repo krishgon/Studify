@@ -44,7 +44,11 @@ function showBlockOverlay() {
       fontFamily: 'Segoe UI, Roboto, sans-serif',
       textAlign: 'center'
     });
-    overlay.textContent = "You can't access this website while on study mode";
+    try {
+      overlay.textContent = (chrome && chrome.i18n) ? chrome.i18n.getMessage('blockedSiteMessage') : "You can't access this website while on study mode";
+    } catch (e) {
+      overlay.textContent = "You can't access this website while on study mode";
+    }
     document.body.appendChild(overlay);
   };
   if (document.body) {

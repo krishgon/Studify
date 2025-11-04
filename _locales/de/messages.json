@@ -1,0 +1,61 @@
+{
+  "extensionName": {"message": "Studify – Achtsames YouTube für Lernen & Fokus"},
+  "extensionDescription": {"message": "Blockiert ablenkende YouTube-Inhalte. Wechsle zwischen Lernmodus und Surfmodus für achtsames, fokussiertes Sehen."},
+  "actionTitle": {"message": "Studify – Achtsames YouTube für Lernen & Fokus"},
+
+  "appName": {"message": "Studify"},
+  "subtitle": {"message": "Achtsames YouTube für Lernen & Fokus"},
+
+  "statusActive": {"message": "Aktiv"},
+  "statusInactive": {"message": "Inaktiv"},
+  "focusToolsEnabled": {"message": "Fokus‑Werkzeuge aktiviert"},
+  "notOnYouTube": {"message": "Nicht auf YouTube"},
+  "browsingModeLabel": {"message": "Surfmodus:"},
+  "switchToStudy": {"message": "Zum Lernmodus wechseln"},
+  "studyModeTimeLeft": {"message": "Lernmodus: noch $1"},
+
+  "howItWorksTitle": {"message": "So funktioniert’s:"},
+  "howItWorksLine1": {"message": "Blockiert Shorts und blendet Ablenkungen aus"},
+  "howItWorksLine2": {"message": "Lern-/Surfmodus mit Timern"},
+  "howItWorksLine3": {"message": "Eigene Websites während des Lernens sperren"},
+  "howItWorksLine4": {"message": "Hilft dir, beim Lernen konzentriert zu bleiben"},
+
+  "addThisWebsiteToBlacklist": {"message": "Diese Website zur Sperrliste hinzufügen"},
+  "blockedWebsites": {"message": "Gesperrte Websites"},
+  "noWebsitesAdded": {"message": "Keine Websites hinzugefügt"},
+  "deleteAlt": {"message": "Löschen"},
+
+  "versionLabel": {"message": "Version $1"},
+  "footerMadeWith": {"message": "Mit ❤️ von einem Studenten für Studierende erstellt"},
+
+  "overlayTitle": {"message": "Was führt dich zu YouTube?"},
+  "studyButton": {"message": "Lernen"},
+  "browseButton": {"message": "Surfen"},
+  "makeTimeCommitmentStudy": {"message": "Lege eine Lernzeit fest"},
+  "howLongBrowse": {"message": "Wie lange möchtest du surfen?"},
+  "minutes": {"message": "Minuten"},
+  "hour": {"message": "Stunde"},
+  "hours": {"message": "Stunden"},
+  "confirmTypeLabel": {"message": "Tippe:"},
+  "start": {"message": "Starten"},
+  "incorrectConfirmationPhrase": {"message": "Falscher Bestätigungssatz"},
+  "studyModeInfo": {"message": "Du kannst erst nach Ende deiner Lernsitzung in den Surfmodus wechseln."},
+
+  "confirmPhrase1": {"message": "Ich bin sicher, dass ich nicht prokrastiniere"},
+  "confirmPhrase2": {"message": "Ich bin überzeugt, dass das keine Prokrastination ist"},
+  "confirmPhrase3": {"message": "Ich bin sicher, dass dieses Surfen notwendig ist"},
+  "confirmPhrase4": {"message": "Ich bin sicher, dass das keine Zeitverschwendung ist"},
+  "confirmPhrase5": {"message": "Ich bin überzeugt, dass dieses Surfen produktiv ist"},
+  "confirmPhrase6": {"message": "Ich bin sicher, dass das keine Prokrastination ist"},
+  "confirmPhrase7": {"message": "Ich bin sicher, dass dieses Surfen gerechtfertigt ist"},
+  "confirmPhrase8": {"message": "Ich bin mir klar, dass das keine Prokrastination ist"},
+  "confirmPhrase9": {"message": "Ich bin sicher, dass dieses Surfen notwendig ist"},
+  "confirmPhrase10": {"message": "Ich bin überzeugt, dass das keine Zeitverschwendung ist"},
+
+  "shortsBlockedTitle": {"message": "Shorts blockiert"},
+  "shortsBlockedBody": {"message": "Studify blockiert YouTube Shorts, damit du fokussiert bleibst."},
+  "goBack": {"message": "Zurück"},
+
+  "blockedSiteMessage": {"message": "Du kannst diese Website im Lernmodus nicht aufrufen"}
+}
+

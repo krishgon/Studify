@@ -1,0 +1,61 @@
+{
+  "extensionName": {"message": "Studify - 学習と集中のための意識的な YouTube"},
+  "extensionDescription": {"message": "注意をそらす YouTube コンテンツをブロック。学習モードと閲覧モードを切り替えて、意識的で集中した視聴を。"},
+  "actionTitle": {"message": "Studify - 学習と集中のための意識的な YouTube"},
+
+  "appName": {"message": "Studify"},
+  "subtitle": {"message": "学習と集中のための意識的な YouTube"},
+
+  "statusActive": {"message": "有効"},
+  "statusInactive": {"message": "無効"},
+  "focusToolsEnabled": {"message": "集中ツールを有効化"},
+  "notOnYouTube": {"message": "YouTube 上ではありません"},
+  "browsingModeLabel": {"message": "閲覧モード:"},
+  "switchToStudy": {"message": "学習モードに切り替える"},
+  "studyModeTimeLeft": {"message": "学習モード: 残り $1"},
+
+  "howItWorksTitle": {"message": "使い方:"},
+  "howItWorksLine1": {"message": "Shorts をブロックし、気を散らす要素を非表示"},
+  "howItWorksLine2": {"message": "学習/閲覧モード＋タイマー"},
+  "howItWorksLine3": {"message": "学習中にカスタムサイトをブロック"},
+  "howItWorksLine4": {"message": "学習に集中し続けるのを支援"},
+
+  "addThisWebsiteToBlacklist": {"message": "このサイトをブロックリストに追加"},
+  "blockedWebsites": {"message": "ブロックしたサイト"},
+  "noWebsitesAdded": {"message": "追加されたサイトはありません"},
+  "deleteAlt": {"message": "削除"},
+
+  "versionLabel": {"message": "バージョン $1"},
+  "footerMadeWith": {"message": "学生のために学生が❤️を込めて作成"},
+
+  "overlayTitle": {"message": "YouTube を使う目的は？"},
+  "studyButton": {"message": "学習"},
+  "browseButton": {"message": "閲覧"},
+  "makeTimeCommitmentStudy": {"message": "学習時間を設定してください"},
+  "howLongBrowse": {"message": "どのくらい閲覧しますか？"},
+  "minutes": {"message": "分"},
+  "hour": {"message": "時間"},
+  "hours": {"message": "時間"},
+  "confirmTypeLabel": {"message": "入力:"},
+  "start": {"message": "開始"},
+  "incorrectConfirmationPhrase": {"message": "確認フレーズが正しくありません"},
+  "studyModeInfo": {"message": "学習セッションが終了するまで閲覧モードに切り替えることはできません。"},
+
+  "confirmPhrase1": {"message": "私は先延ばししていないと確信しています"},
+  "confirmPhrase2": {"message": "これは先延ばしではないと確信しています"},
+  "confirmPhrase3": {"message": "この閲覧は必要だと確信しています"},
+  "confirmPhrase4": {"message": "これは時間の無駄ではないと確信しています"},
+  "confirmPhrase5": {"message": "この閲覧は生産的だと確信しています"},
+  "confirmPhrase6": {"message": "これは先延ばしではないと確信しています"},
+  "confirmPhrase7": {"message": "この閲覧は正当だと確信しています"},
+  "confirmPhrase8": {"message": "これは先延ばしではないと確信しています"},
+  "confirmPhrase9": {"message": "この閲覧は必要だと確信しています"},
+  "confirmPhrase10": {"message": "これは時間の無駄ではないと確信しています"},
+
+  "shortsBlockedTitle": {"message": "Shorts をブロックしました"},
+  "shortsBlockedBody": {"message": "集中を保つため、YouTube Shorts をブロックします。"},
+  "goBack": {"message": "戻る"},
+
+  "blockedSiteMessage": {"message": "学習モード中はこのサイトにアクセスできません"}
+}
+

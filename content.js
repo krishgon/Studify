@@ -10,6 +10,15 @@ const DISABLED_UNTIL_KEY = 'studifyDisabledUntil';
 const STUDY_UNTIL_KEY = 'studifyStudyUntil';
 const STUDIFY_LOGO_URL = chrome.runtime.getURL('icons/iconCirc128.png');
 
+// i18n helper
+function t(key, substitutions) {
+  try {
+    if (Array.isArray(substitutions)) return chrome.i18n.getMessage(key, substitutions);
+    if (typeof substitutions !== 'undefined') return chrome.i18n.getMessage(key, String(substitutions));
+    return chrome.i18n.getMessage(key) || key;
+  } catch (e) { return key; }
+}
+
 // Prompt the user for their intent and duration before allowing YouTube access
 // If an initial mode is provided, skip the mode selection prompt and go
 // straight to the duration screen for that mode.
@@ -20,10 +29,10 @@ function showPurposeOverlay(initialMode) {
     overlay.innerHTML = `
       <div class="studify-modal">
         <img src="${STUDIFY_LOGO_URL}" alt="Studify logo" class="studify-logo" />
-        <h1 class="studify-title">What brings you to YouTube?</h1>
+        <h1 class="studify-title">${t('overlayTitle')}</h1>
         <div class="studify-choice">
-          <button class="studify-btn" data-mode="study">Study</button>
-          <button class="studify-btn" data-mode="browse">Browse</button>
+          <button class="studify-btn" data-mode="study">${t('studyButton')}</button>
+          <button class="studify-btn" data-mode="browse">${t('browseButton')}</button>
         </div>
       </div>
     `;
@@ -124,9 +133,10 @@ function showPurposeOverlay(initialMode) {
       const formatLabel = (m) => {
         if (m % 60 === 0) {
           const h = m / 60;
-          return `${h} hour${h > 1 ? 's' : ''}`;
+          const unit = (h > 1 ? t('hours') : t('hour')) || (h > 1 ? 'hours' : 'hour');
+          return `${h} ${unit}`;
         }
-        return `${m} minutes`;
+        return `${m} ${t('minutes') || 'minutes'}`;
       };
       const selectHtml = options
         .map((m) => `<option value="${m}">${formatLabel(m)}</option>`)
@@ -134,32 +144,32 @@ function showPurposeOverlay(initialMode) {
 
       // Generate random confirmation phrase
       const confirmationPhrases = [
-        "I am sure I am not procrastinating",
-        "I am confident this is not procrastination",
-        "I am certain this browsing is necessary",
-        "I am positive this is not time wasting",
-        "I am convinced this is productive browsing",
-        "I am assured this is not procrastination",
-        "I am definite this browsing is justified",
-        "I am clear this is not procrastination",
-        "I am certain this is necessary browsing",
-        "I am confident this is not time wasting"
-      ];
+        t('confirmPhrase1'),
+        t('confirmPhrase2'),
+        t('confirmPhrase3'),
+        t('confirmPhrase4'),
+        t('confirmPhrase5'),
+        t('confirmPhrase6'),
+        t('confirmPhrase7'),
+        t('confirmPhrase8'),
+        t('confirmPhrase9'),
+        t('confirmPhrase10')
+      ].filter(Boolean);
       
       const randomPhrase = confirmationPhrases[Math.floor(Math.random() * confirmationPhrases.length)];
 
       modal.innerHTML = `
         <img src="${STUDIFY_LOGO_URL}" alt="Studify logo" class="studify-logo" />
-        <h1 class="studify-title">${mode === 'study' ? 'Make a time commitment to study' : 'How long will you browse?'}</h1>
+        <h1 class="studify-title">${mode === 'study' ? t('makeTimeCommitmentStudy') : t('howLongBrowse')}</h1>
         <div class="studify-inputs">
           <select id="studify-duration">${selectHtml}</select>
           ${mode === 'browse'
-            ? `<div style="font-size:16px; text-align:left; user-select:none; -webkit-user-select:none; -ms-user-select:none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent;">Type: <b>${randomPhrase}</b></div>
+            ? `<div style="font-size:16px; text-align:left; user-select:none; -webkit-user-select:none; -ms-user-select:none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent;">${t('confirmTypeLabel') || 'Type:'} <b>${randomPhrase}</b></div>
                <input id="studify-confirm" type="text" autocomplete="off" data-form-type="other" data-lpignore="true" spellcheck="false">`
             : ''}
-          <button class="studify-start-btn">Start</button>
-          <div class="studify-error" style="display:none;">Incorrect confirmation phrase</div>
-          ${mode === 'study' ? '<div class="studify-info">You won\'t be able to switch to browse mode until your study session ends.</div>' : ''}
+          <button class="studify-start-btn">${t('start') || 'Start'}</button>
+          <div class="studify-error" style="display:none;">${t('incorrectConfirmationPhrase') || 'Incorrect confirmation phrase'}</div>
+          ${mode === 'study' ? `<div class="studify-info">${t('studyModeInfo') || "You won't be able to switch to browse mode until your study session ends."}</div>` : ''}
         </div>
       `;
 
@@ -404,9 +414,9 @@ function blockShortsPage() {
     <div id="studify-block-page">
       <div class="studify-modal">
         <img src="${STUDIFY_LOGO_URL}" alt="Studify logo" class="studify-logo" />
-        <h1>Shorts Blocked</h1>
-        <p>Studify blocks YouTube Shorts to keep you focused.</p>
-        <button id="studify-go-back-btn">Go Back</button>
+        <h1>${t('shortsBlockedTitle') || 'Shorts Blocked'}</h1>
+        <p>${t('shortsBlockedBody') || 'Studify blocks YouTube Shorts to keep you focused.'}</p>
+        <button id="studify-go-back-btn">${t('goBack') || 'Go Back'}</button>
       </div>
     </div>
   `;

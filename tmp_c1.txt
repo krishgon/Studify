@@ -1,0 +1,220 @@
+// Studify Content Script
+// This script runs on YouTube pages to filter content based on video category
+
+// console.log('Studify: Content script loaded');
+
+// Keep references to observers and listeners to avoid duplicates
+let navigateListener = null;
+
+const DISABLED_UNTIL_KEY = 'studifyDisabledUntil';
+const STUDY_UNTIL_KEY = 'studifyStudyUntil';
+const STUDIFY_LOGO_URL = chrome.runtime.getURL('icons/iconCirc128.png');
+
+// Prompt the user for their intent and duration before allowing YouTube access
+// If an initial mode is provided, skip the mode selection prompt and go
+// straight to the duration screen for that mode.
+function showPurposeOverlay(initialMode) {
+  return new Promise((resolve) => {
+    const overlay = document.createElement('div');
+    overlay.id = 'studify-purpose-overlay';
+    overlay.innerHTML = `
+      <div class="studify-modal">
+        <img src="${STUDIFY_LOGO_URL}" alt="Studify logo" class="studify-logo" />
+        <h1 class="studify-title">What brings you to YouTube?</h1>
+        <div class="studify-choice">
+          <button class="studify-btn" data-mode="study">Study</button>
+          <button class="studify-btn" data-mode="browse">Browse</button>
+        </div>
+      </div>
+    `;
+
+    const style = document.createElement('style');
+    style.textContent = `
+      #studify-purpose-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 9999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(0, 0, 0, 0.6);
+        backdrop-filter: blur(6px);
+        font-family: 'Segoe UI', Roboto, sans-serif;
+      }
+      #studify-purpose-overlay .studify-modal {
+        background: #ffffff;
+        border-radius: 12px;
+        padding: 40px 30px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        text-align: center;
+        max-width: 400px;
+        width: 90%;
+      }
+      .studify-logo {
+        width: 80px;
+        height: 80px;
+        margin-bottom: 20px;
+      }
+      #studify-purpose-overlay h1 {
+        margin: 0 0 20px;
+        font-size: 24px;
+        color: #111827;
+      }
+      .studify-choice {
+        display: flex;
+        gap: 16px;
+        justify-content: center;
+      }
+      .studify-btn {
+        flex: 1;
+        padding: 12px 0;
+        font-size: 16px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        color: #ffffff;
+        transition: background 0.2s;
+      }
+      .studify-btn[data-mode="study"] { background: #22c55e; }
+      .studify-btn[data-mode="study"]:hover { background: #16a34a; }
+      .studify-btn[data-mode="browse"] { background: #3b82f6; }
+      .studify-btn[data-mode="browse"]:hover { background: #2563eb; }
+      .studify-inputs {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+      .studify-inputs input,
+      .studify-inputs select {
+        padding: 10px;
+        font-size: 16px;
+        border: 1px solid #cbd5e1;
+        border-radius: 6px;
+      }
+      .studify-error {
+        color: #ef4444;
+        font-size: 14px;
+      }
+      .studify-start-btn {
+        padding: 12px;
+        background: #6366f1;
+        color: #ffffff;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: background 0.2s;
+      }
+      .studify-start-btn:hover { background: #4f46e5; }
+      .studify-info {
+        color: #6b7280;
+        font-size: 14px;
+        margin-top: 12px;
+        line-height: 1.4;
+        font-style: italic;
+      }
+    `;
+    overlay.appendChild(style);
+
+    function askDuration(mode) {
+      const modal = overlay.querySelector('.studify-modal');
+      const options = mode === 'browse'
+        ? [5, 10, 15, 30, 45, 60]
+        : [30, 60, 120, 180, 240];
+      const formatLabel = (m) => {
+        if (m % 60 === 0) {
+          const h = m / 60;
+          return `${h} hour${h > 1 ? 's' : ''}`;
+        }
+        return `${m} minutes`;
+      };
+      const selectHtml = options
+        .map((m) => `<option value="${m}">${formatLabel(m)}</option>`)
+        .join('');
+
+      // Generate random confirmation phrase
+      const confirmationPhrases = [
+        "I am sure I am not procrastinating",
+        "I am confident this is not procrastination",
+        "I am certain this browsing is necessary",
+        "I am positive this is not time wasting",
+        "I am convinced this is productive browsing",
+        "I am assured this is not procrastination",
+        "I am definite this browsing is justified",
+        "I am clear this is not procrastination",
+        "I am certain this is necessary browsing",
+        "I am confident this is not time wasting"
+      ];
+      
+      const randomPhrase = confirmationPhrases[Math.floor(Math.random() * confirmationPhrases.length)];
+
+      modal.innerHTML = `
+        <img src="${STUDIFY_LOGO_URL}" alt="Studify logo" class="studify-logo" />
+        <h1 class="studify-title">${mode === 'study' ? 'Make a time commitment to study' : 'How long will you browse?'}</h1>
+        <div class="studify-inputs">
+          <select id="studify-duration">${selectHtml}</select>
+          ${mode === 'browse'
+            ? `<div style="font-size:16px; text-align:left; user-select:none; -webkit-user-select:none; -ms-user-select:none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent;">Type: <b>${randomPhrase}</b></div>
+               <input id="studify-confirm" type="text" autocomplete="off" data-form-type="other" data-lpignore="true" spellcheck="false">`
+            : ''}
+          <button class="studify-start-btn">Start</button>
+          <div class="studify-error" style="display:none;">Incorrect confirmation phrase</div>
+          ${mode === 'study' ? '<div class="studify-info">You won\'t be able to switch to browse mode until your study session ends.</div>' : ''}
+        </div>
+      `;
+
+      const errorEl = modal.querySelector('.studify-error');
+      const startBtn = modal.querySelector('.studify-start-btn');
+      // Allow pressing Enter in browse confirmation input to start
+      if (mode === 'browse') {
+        const confirmInput = document.getElementById('studify-confirm');
+        if (confirmInput && startBtn) {
+          confirmInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+              e.preventDefault();
+              startBtn.click();
+            }
+          });
+        }
+      }
+      startBtn.addEventListener('click', () => {
+        errorEl.style.display = 'none';
+        const minutes = parseInt(document.getElementById('studify-duration').value, 10);
+        if (isNaN(minutes) || minutes <= 0) return;
+        if (mode === 'browse') {
+          const confirmation = document.getElementById('studify-confirm').value.trim();
+          if (confirmation.toLowerCase() !== randomPhrase.toLowerCase()) {
+            errorEl.style.display = 'block';
+            return;
+          }
+          const disabledUntil = Date.now() + minutes * 60 * 1000;
+          localStorage.setItem(DISABLED_UNTIL_KEY, String(disabledUntil));
+          try {
+            if (chrome && chrome.storage && chrome.storage.local) {
+              chrome.storage.local.set({ [DISABLED_UNTIL_KEY]: String(disabledUntil) });
+            }
+          } catch (e) {}
+          overlay.remove();
+          resolve('browse');
+        } else {
+          const studyUntil = Date.now() + minutes * 60 * 1000;
+          localStorage.setItem(STUDY_UNTIL_KEY, String(studyUntil));
+          try {
+            if (chrome && chrome.storage && chrome.storage.local) {
+              chrome.storage.local.set({ [STUDY_UNTIL_KEY]: String(studyUntil) });
+            }
+          } catch (e) {}
+          overlay.remove();
+          resolve('study');
+        }
+      });
+
+      if (mode === 'browse') {
+        const confirmInput = document.getElementById('studify-confirm');
+        confirmInput.addEventListener('input', () => {
+          errorEl.style.display = 'none';
+        });
+      }
+    }
+
+    if (!initialMode) {

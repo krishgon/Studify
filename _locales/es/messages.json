@@ -1,0 +1,61 @@
+{
+  "extensionName": {"message": "Studify - YouTube consciente para estudio y concentración"},
+  "extensionDescription": {"message": "Bloquea contenido distractor de YouTube. Cambia entre Modo Estudio y Modo Navegar para una visualización consciente y enfocada."},
+  "actionTitle": {"message": "Studify - YouTube consciente para estudio y concentración"},
+
+  "appName": {"message": "Studify"},
+  "subtitle": {"message": "YouTube consciente para estudio y concentración"},
+
+  "statusActive": {"message": "Activo"},
+  "statusInactive": {"message": "Inactivo"},
+  "focusToolsEnabled": {"message": "Herramientas de enfoque habilitadas"},
+  "notOnYouTube": {"message": "Fuera de YouTube"},
+  "browsingModeLabel": {"message": "Modo navegar:"},
+  "switchToStudy": {"message": "Cambiar a Modo Estudio"},
+  "studyModeTimeLeft": {"message": "Modo estudio: queda $1"},
+
+  "howItWorksTitle": {"message": "Cómo funciona:"},
+  "howItWorksLine1": {"message": "Bloquea Shorts y oculta distracciones"},
+  "howItWorksLine2": {"message": "Modos Estudio/Navegar con temporizadores"},
+  "howItWorksLine3": {"message": "Lista negra de sitios personalizados durante el estudio"},
+  "howItWorksLine4": {"message": "Te ayuda a mantener el enfoque en el aprendizaje"},
+
+  "addThisWebsiteToBlacklist": {"message": "Añadir este sitio a la lista negra"},
+  "blockedWebsites": {"message": "Sitios bloqueados"},
+  "noWebsitesAdded": {"message": "No hay sitios añadidos"},
+  "deleteAlt": {"message": "Eliminar"},
+
+  "versionLabel": {"message": "Versión $1"},
+  "footerMadeWith": {"message": "Hecho con ❤️ para estudiantes por un estudiante"},
+
+  "overlayTitle": {"message": "¿Qué te trae a YouTube?"},
+  "studyButton": {"message": "Estudio"},
+  "browseButton": {"message": "Navegar"},
+  "makeTimeCommitmentStudy": {"message": "Comprométete con un tiempo de estudio"},
+  "howLongBrowse": {"message": "¿Cuánto tiempo vas a navegar?"},
+  "minutes": {"message": "minutos"},
+  "hour": {"message": "hora"},
+  "hours": {"message": "horas"},
+  "confirmTypeLabel": {"message": "Escribe:"},
+  "start": {"message": "Comenzar"},
+  "incorrectConfirmationPhrase": {"message": "Frase de confirmación incorrecta"},
+  "studyModeInfo": {"message": "No podrás cambiar a modo navegar hasta que termine tu sesión de estudio."},
+
+  "confirmPhrase1": {"message": "Estoy seguro de que no estoy procrastinando"},
+  "confirmPhrase2": {"message": "Estoy convencido de que esto no es procrastinación"},
+  "confirmPhrase3": {"message": "Estoy seguro de que esta navegación es necesaria"},
+  "confirmPhrase4": {"message": "Estoy seguro de que esto no es perder el tiempo"},
+  "confirmPhrase5": {"message": "Estoy convencido de que esta navegación es productiva"},
+  "confirmPhrase6": {"message": "Estoy seguro de que esto no es procrastinación"},
+  "confirmPhrase7": {"message": "Estoy seguro de que esta navegación está justificada"},
+  "confirmPhrase8": {"message": "Tengo claro que esto no es procrastinación"},
+  "confirmPhrase9": {"message": "Estoy seguro de que esta navegación es necesaria"},
+  "confirmPhrase10": {"message": "Estoy convencido de que esto no es perder el tiempo"},
+
+  "shortsBlockedTitle": {"message": "Shorts bloqueados"},
+  "shortsBlockedBody": {"message": "Studify bloquea Shorts de YouTube para ayudarte a concentrarte."},
+  "goBack": {"message": "Volver"},
+
+  "blockedSiteMessage": {"message": "No puedes acceder a este sitio web mientras estás en modo estudio"}
+}
+

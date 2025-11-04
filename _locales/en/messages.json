@@ -1,0 +1,61 @@
+{
+  "extensionName": {"message": "Studify - Mindful YouTube for Study & Focus"},
+  "extensionDescription": {"message": "Block distracting YouTube content. Switch between Study Mode and Browse Mode for mindful, focused viewing."},
+  "actionTitle": {"message": "Studify - Mindful YouTube for Study & Focus"},
+
+  "appName": {"message": "Studify"},
+  "subtitle": {"message": "Mindful YouTube for Study & Focus"},
+
+  "statusActive": {"message": "Active"},
+  "statusInactive": {"message": "Inactive"},
+  "focusToolsEnabled": {"message": "Focus tools enabled"},
+  "notOnYouTube": {"message": "Not on YouTube"},
+  "browsingModeLabel": {"message": "Browsing mode:"},
+  "switchToStudy": {"message": "Switch to Study Mode"},
+  "studyModeTimeLeft": {"message": "Study mode: $1 left"},
+
+  "howItWorksTitle": {"message": "How it works:"},
+  "howItWorksLine1": {"message": "Blocks Shorts and hides distractions"},
+  "howItWorksLine2": {"message": "Study/Browse modes with timers"},
+  "howItWorksLine3": {"message": "Blacklist custom websites during study"},
+  "howItWorksLine4": {"message": "Helps you stay focused on learning"},
+
+  "addThisWebsiteToBlacklist": {"message": "Add this website to blacklist"},
+  "blockedWebsites": {"message": "Blocked websites"},
+  "noWebsitesAdded": {"message": "No websites added"},
+  "deleteAlt": {"message": "Delete"},
+
+  "versionLabel": {"message": "Version $1"},
+  "footerMadeWith": {"message": "Made with ❤️ for students by a student"},
+
+  "overlayTitle": {"message": "What brings you to YouTube?"},
+  "studyButton": {"message": "Study"},
+  "browseButton": {"message": "Browse"},
+  "makeTimeCommitmentStudy": {"message": "Make a time commitment to study"},
+  "howLongBrowse": {"message": "How long will you browse?"},
+  "minutes": {"message": "minutes"},
+  "hour": {"message": "hour"},
+  "hours": {"message": "hours"},
+  "confirmTypeLabel": {"message": "Type:"},
+  "start": {"message": "Start"},
+  "incorrectConfirmationPhrase": {"message": "Incorrect confirmation phrase"},
+  "studyModeInfo": {"message": "You won't be able to switch to browse mode until your study session ends."},
+
+  "confirmPhrase1": {"message": "I am sure I am not procrastinating"},
+  "confirmPhrase2": {"message": "I am confident this is not procrastination"},
+  "confirmPhrase3": {"message": "I am certain this browsing is necessary"},
+  "confirmPhrase4": {"message": "I am positive this is not time wasting"},
+  "confirmPhrase5": {"message": "I am convinced this is productive browsing"},
+  "confirmPhrase6": {"message": "I am assured this is not procrastination"},
+  "confirmPhrase7": {"message": "I am definite this browsing is justified"},
+  "confirmPhrase8": {"message": "I am clear this is not procrastination"},
+  "confirmPhrase9": {"message": "I am certain this is necessary browsing"},
+  "confirmPhrase10": {"message": "I am confident this is not time wasting"},
+
+  "shortsBlockedTitle": {"message": "Shorts Blocked"},
+  "shortsBlockedBody": {"message": "Studify blocks YouTube Shorts to keep you focused."},
+  "goBack": {"message": "Go Back"},
+
+  "blockedSiteMessage": {"message": "You can't access this website while on study mode"}
+}
+

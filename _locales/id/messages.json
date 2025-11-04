@@ -1,0 +1,61 @@
+{
+  "extensionName": {"message": "Studify - YouTube sadar untuk belajar & fokus"},
+  "extensionDescription": {"message": "Memblokir konten YouTube yang mengganggu. Beralih antara Mode Belajar dan Mode Menjelajah untuk tontonan yang sadar dan fokus."},
+  "actionTitle": {"message": "Studify - YouTube sadar untuk belajar & fokus"},
+
+  "appName": {"message": "Studify"},
+  "subtitle": {"message": "YouTube sadar untuk belajar & fokus"},
+
+  "statusActive": {"message": "Aktif"},
+  "statusInactive": {"message": "Nonaktif"},
+  "focusToolsEnabled": {"message": "Alat fokus diaktifkan"},
+  "notOnYouTube": {"message": "Bukan di YouTube"},
+  "browsingModeLabel": {"message": "Mode menjelajah:"},
+  "switchToStudy": {"message": "Beralih ke Mode Belajar"},
+  "studyModeTimeLeft": {"message": "Mode belajar: sisa $1"},
+
+  "howItWorksTitle": {"message": "Cara kerja:"},
+  "howItWorksLine1": {"message": "Memblokir Shorts dan menyembunyikan distraksi"},
+  "howItWorksLine2": {"message": "Mode Belajar/Navigasi dengan pengatur waktu"},
+  "howItWorksLine3": {"message": "Daftar blokir situs kustom saat belajar"},
+  "howItWorksLine4": {"message": "Membantu Anda tetap fokus belajar"},
+
+  "addThisWebsiteToBlacklist": {"message": "Tambahkan situs ini ke daftar blokir"},
+  "blockedWebsites": {"message": "Situs yang diblokir"},
+  "noWebsitesAdded": {"message": "Belum ada situs"},
+  "deleteAlt": {"message": "Hapus"},
+
+  "versionLabel": {"message": "Versi $1"},
+  "footerMadeWith": {"message": "Dibuat dengan ❤️ untuk pelajar oleh seorang pelajar"},
+
+  "overlayTitle": {"message": "Apa tujuan Anda di YouTube?"},
+  "studyButton": {"message": "Belajar"},
+  "browseButton": {"message": "Menjelajah"},
+  "makeTimeCommitmentStudy": {"message": "Tentukan durasi belajar"},
+  "howLongBrowse": {"message": "Berapa lama Anda akan menjelajah?"},
+  "minutes": {"message": "menit"},
+  "hour": {"message": "jam"},
+  "hours": {"message": "jam"},
+  "confirmTypeLabel": {"message": "Ketik:"},
+  "start": {"message": "Mulai"},
+  "incorrectConfirmationPhrase": {"message": "Frasa konfirmasi salah"},
+  "studyModeInfo": {"message": "Anda tidak dapat beralih ke mode menjelajah hingga sesi belajar berakhir."},
+
+  "confirmPhrase1": {"message": "Saya yakin saya tidak menunda-nunda"},
+  "confirmPhrase2": {"message": "Saya yakin ini bukan penundaan"},
+  "confirmPhrase3": {"message": "Saya yakin penjelajahan ini diperlukan"},
+  "confirmPhrase4": {"message": "Saya yakin ini bukan buang-buang waktu"},
+  "confirmPhrase5": {"message": "Saya yakin penjelajahan ini produktif"},
+  "confirmPhrase6": {"message": "Saya yakin ini bukan penundaan"},
+  "confirmPhrase7": {"message": "Saya yakin penjelajahan ini dapat dibenarkan"},
+  "confirmPhrase8": {"message": "Saya yakin ini bukan penundaan"},
+  "confirmPhrase9": {"message": "Saya yakin penjelajahan ini diperlukan"},
+  "confirmPhrase10": {"message": "Saya yakin ini bukan buang-buang waktu"},
+
+  "shortsBlockedTitle": {"message": "Shorts Diblokir"},
+  "shortsBlockedBody": {"message": "Studify memblokir YouTube Shorts agar Anda tetap fokus."},
+  "goBack": {"message": "Kembali"},
+
+  "blockedSiteMessage": {"message": "Anda tidak dapat mengakses situs ini saat mode belajar aktif"}
+}
+

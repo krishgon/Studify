@@ -1,0 +1,61 @@
+{
+  "extensionName": {"message": "Studify - يوتيوب واعٍ للدراسة والتركيز"},
+  "extensionDescription": {"message": "يحجب محتوى يوتيوب المشتت. بدّل بين وضع الدراسة ووضع التصفح لمشاهدة واعية ومركزة."},
+  "actionTitle": {"message": "Studify - يوتيوب واعٍ للدراسة والتركيز"},
+
+  "appName": {"message": "Studify"},
+  "subtitle": {"message": "يوتيوب واعٍ للدراسة والتركيز"},
+
+  "statusActive": {"message": "نشط"},
+  "statusInactive": {"message": "غير نشط"},
+  "focusToolsEnabled": {"message": "تم تفعيل أدوات التركيز"},
+  "notOnYouTube": {"message": "لست على يوتيوب"},
+  "browsingModeLabel": {"message": "وضع التصفح:"},
+  "switchToStudy": {"message": "التحويل إلى وضع الدراسة"},
+  "studyModeTimeLeft": {"message": "وضع الدراسة: تبقى $1"},
+
+  "howItWorksTitle": {"message": "كيف يعمل:"},
+  "howItWorksLine1": {"message": "يحجب Shorts ويخفي المشتتات"},
+  "howItWorksLine2": {"message": "أوضاع دراسة/تصفح مع مؤقتات"},
+  "howItWorksLine3": {"message": "حظر مواقع مخصصة أثناء الدراسة"},
+  "howItWorksLine4": {"message": "يساعدك على البقاء مركزًا على التعلم"},
+
+  "addThisWebsiteToBlacklist": {"message": "إضافة هذا الموقع إلى قائمة الحظر"},
+  "blockedWebsites": {"message": "المواقع المحظورة"},
+  "noWebsitesAdded": {"message": "لا توجد مواقع مضافة"},
+  "deleteAlt": {"message": "حذف"},
+
+  "versionLabel": {"message": "الإصدار $1"},
+  "footerMadeWith": {"message": "صنع بحب ❤️ للطلاب بواسطة طالب"},
+
+  "overlayTitle": {"message": "ما الذي أتى بك إلى يوتيوب؟"},
+  "studyButton": {"message": "الدراسة"},
+  "browseButton": {"message": "التصفح"},
+  "makeTimeCommitmentStudy": {"message": "التزم بوقت للدراسة"},
+  "howLongBrowse": {"message": "كم من الوقت ستتصفح؟"},
+  "minutes": {"message": "دقائق"},
+  "hour": {"message": "ساعة"},
+  "hours": {"message": "ساعات"},
+  "confirmTypeLabel": {"message": "اكتب:"},
+  "start": {"message": "بدء"},
+  "incorrectConfirmationPhrase": {"message": "عبارة تأكيد غير صحيحة"},
+  "studyModeInfo": {"message": "لن تتمكن من التحويل إلى وضع التصفح حتى تنتهي جلسة الدراسة."},
+
+  "confirmPhrase1": {"message": "أنا متأكد أنني لا أؤجل العمل"},
+  "confirmPhrase2": {"message": "أنا واثق أن هذا ليس تسويفًا"},
+  "confirmPhrase3": {"message": "أنا متأكد أن هذا التصفح ضروري"},
+  "confirmPhrase4": {"message": "أنا متأكد أن هذا ليس مضيعة للوقت"},
+  "confirmPhrase5": {"message": "أنا مقتنع أن هذا التصفح منتج"},
+  "confirmPhrase6": {"message": "أنا متأكد أن هذا ليس تسويفًا"},
+  "confirmPhrase7": {"message": "أنا متأكد أن هذا التصفح مبرر"},
+  "confirmPhrase8": {"message": "أنا متيقن أن هذا ليس تسويفًا"},
+  "confirmPhrase9": {"message": "أنا متأكد أن هذا التصفح ضروري"},
+  "confirmPhrase10": {"message": "أنا واثق أن هذا ليس مضيعة للوقت"},
+
+  "shortsBlockedTitle": {"message": "تم حظر Shorts"},
+  "shortsBlockedBody": {"message": "يحجب Studify مقاطع Shorts في يوتيوب للحفاظ على تركيزك."},
+  "goBack": {"message": "عودة"},
+
+  "blockedSiteMessage": {"message": "لا يمكنك الوصول إلى هذا الموقع أثناء وضع الدراسة"}
+}
+

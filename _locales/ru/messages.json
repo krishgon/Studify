@@ -1,0 +1,61 @@
+{
+  "extensionName": {"message": "Studify — осознанный YouTube для учёбы и фокуса"},
+  "extensionDescription": {"message": "Блокирует отвлекающий контент YouTube. Переключайтесь между режимами Учёбы и Просмотра для осознанного, сосредоченного использования."},
+  "actionTitle": {"message": "Studify — осознанный YouTube для учёбы и фокуса"},
+
+  "appName": {"message": "Studify"},
+  "subtitle": {"message": "Осознанный YouTube для учёбы и фокуса"},
+
+  "statusActive": {"message": "Активно"},
+  "statusInactive": {"message": "Неактивно"},
+  "focusToolsEnabled": {"message": "Инструменты фокуса включены"},
+  "notOnYouTube": {"message": "Не на YouTube"},
+  "browsingModeLabel": {"message": "Режим просмотра:"},
+  "switchToStudy": {"message": "Переключиться в режим Учёбы"},
+  "studyModeTimeLeft": {"message": "Режим учёбы: осталось $1"},
+
+  "howItWorksTitle": {"message": "Как это работает:"},
+  "howItWorksLine1": {"message": "Блокирует Shorts и скрывает отвлекающие элементы"},
+  "howItWorksLine2": {"message": "Режимы Учёба/Просмотр с таймерами"},
+  "howItWorksLine3": {"message": "Чёрный список сайтов во время учёбы"},
+  "howItWorksLine4": {"message": "Помогает оставаться сосредоточенным на обучении"},
+
+  "addThisWebsiteToBlacklist": {"message": "Добавить сайт в чёрный список"},
+  "blockedWebsites": {"message": "Заблокированные сайты"},
+  "noWebsitesAdded": {"message": "Сайты не добавлены"},
+  "deleteAlt": {"message": "Удалить"},
+
+  "versionLabel": {"message": "Версия $1"},
+  "footerMadeWith": {"message": "Сделано с ❤️ для студентов студентом"},
+
+  "overlayTitle": {"message": "Зачем вы пришли на YouTube?"},
+  "studyButton": {"message": "Учиться"},
+  "browseButton": {"message": "Просматривать"},
+  "makeTimeCommitmentStudy": {"message": "Выберите время для учёбы"},
+  "howLongBrowse": {"message": "Как долго вы будете просматривать?"},
+  "minutes": {"message": "минут"},
+  "hour": {"message": "час"},
+  "hours": {"message": "часов"},
+  "confirmTypeLabel": {"message": "Введите:"},
+  "start": {"message": "Начать"},
+  "incorrectConfirmationPhrase": {"message": "Неверная фраза подтверждения"},
+  "studyModeInfo": {"message": "Нельзя перейти в режим просмотра до окончания учебной сессии."},
+
+  "confirmPhrase1": {"message": "Я уверен, что не прокрастинирую"},
+  "confirmPhrase2": {"message": "Я уверен, что это не прокрастинация"},
+  "confirmPhrase3": {"message": "Я уверен, что этот просмотр необходим"},
+  "confirmPhrase4": {"message": "Я уверен, что это не пустая трата времени"},
+  "confirmPhrase5": {"message": "Я уверен, что этот просмотр продуктивен"},
+  "confirmPhrase6": {"message": "Я уверен, что это не прокрастинация"},
+  "confirmPhrase7": {"message": "Я уверен, что этот просмотр оправдан"},
+  "confirmPhrase8": {"message": "Я уверен, что это не прокрастинация"},
+  "confirmPhrase9": {"message": "Я уверен, что этот просмотр необходим"},
+  "confirmPhrase10": {"message": "Я уверен, что это не пустая трата времени"},
+
+  "shortsBlockedTitle": {"message": "Shorts заблокированы"},
+  "shortsBlockedBody": {"message": "Studify блокирует YouTube Shorts, чтобы вы оставались сосредоточены."},
+  "goBack": {"message": "Назад"},
+
+  "blockedSiteMessage": {"message": "Вы не можете открыть этот сайт в режиме учёбы"}
+}
+

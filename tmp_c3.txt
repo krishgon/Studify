@@ -1,0 +1,164 @@
+      color: #f87171;
+    }
+    #studify-block-page p {
+      margin-bottom: 20px;
+      color: #cbd5e1;
+      line-height: 1.4;
+    }
+    #studify-go-back-btn {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      background: #3b82f6;
+      color: #ffffff;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    #studify-go-back-btn:hover { background: #2563eb; }
+  `;
+  document.head.appendChild(style);
+  const btn = document.getElementById('studify-go-back-btn');
+  if (btn) {
+    btn.addEventListener('click', goBack, { once: true });
+  }
+}
+
+// Main function to run when page loads
+function main() {
+  // console.log('Studify: Starting content analysis...');
+
+  // Always hide Shorts UI elements site-wide
+  enableShortsHider();
+
+  // Block Shorts pages entirely
+  if (isYouTubeShortsPage()) {
+    blockShortsPage();
+    return;
+  }
+
+  // Only run content filtering on YouTube watch pages
+  if (isYouTubeWatchPage()) {
+    // Keep distraction-hiding behavior, but remove category-based blocking
+    hideWatchSidebar();
+  } else if (isYouTubeHomePage()) {
+    hideHomeFeed();
+    showWatchSidebar();
+    // console.log('Studify: Home page detected - hiding feed');
+  } else {
+    showHomeFeed();
+    showWatchSidebar();
+    // console.log('Studify: Not a watch page - allowing access to YouTube');
+  }
+}
+
+// Smart navigation monitoring - only triggers on actual video changes
+function setupSmartNavigationMonitoring() {
+  // Remove existing listener to prevent duplicates
+  if (navigateListener) {
+    window.removeEventListener('yt-navigate-finish', navigateListener);
+  }
+
+  // Only listen to YouTube's official navigation event
+  navigateListener = () => {
+    // console.log('Studify: YouTube navigation detected');
+
+    // Small delay to ensure page is fully loaded
+    setTimeout(() => {
+      main();
+    }, 1000);
+  };
+
+  window.addEventListener('yt-navigate-finish', navigateListener);
+}
+
+async function init() {
+  const disabledUntil = parseInt(localStorage.getItem(DISABLED_UNTIL_KEY) || '0', 10);
+  if (Date.now() < disabledUntil) {
+    try {
+      if (chrome && chrome.storage && chrome.storage.local) {
+        chrome.storage.local.set({ [DISABLED_UNTIL_KEY]: String(disabledUntil) });
+      }
+    } catch (e) {}
+    const remaining = disabledUntil - Date.now();
+    // console.log('Studify: Extension paused for browsing mode');
+    scheduleModePrompt(remaining, 'browse');
+    return;
+  } else {
+    try {
+      if (chrome && chrome.storage && chrome.storage.local) {
+        chrome.storage.local.remove(DISABLED_UNTIL_KEY);
+      }
+    } catch (e) {}
+  }
+
+  const studyUntil = parseInt(localStorage.getItem(STUDY_UNTIL_KEY) || '0', 10);
+  let inStudy = Date.now() < studyUntil;
+
+  if (inStudy) {
+    try {
+      if (chrome && chrome.storage && chrome.storage.local) {
+        chrome.storage.local.set({ [STUDY_UNTIL_KEY]: String(studyUntil) });
+      }
+    } catch (e) {}
+  } else {
+    try {
+      if (chrome && chrome.storage && chrome.storage.local) {
+        chrome.storage.local.remove(STUDY_UNTIL_KEY);
+      }
+    } catch (e) {}
+  }
+
+  if (!inStudy) {
+    const choice = await showPurposeOverlay();
+    if (choice === 'browse') {
+      const disabledUntilNew = parseInt(localStorage.getItem(DISABLED_UNTIL_KEY) || '0', 10);
+      const remaining = disabledUntilNew - Date.now();
+      if (remaining > 0) {
+        scheduleModePrompt(remaining, 'browse');
+      }
+      return;
+    }
+    inStudy = true;
+  }
+
+  const studyEnd = parseInt(localStorage.getItem(STUDY_UNTIL_KEY) || '0', 10);
+  const remainingStudy = studyEnd - Date.now();
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', main);
+  } else {
+    main();
+  }
+
+  setTimeout(() => {
+    setupSmartNavigationMonitoring();
+  }, 3000);
+
+  if (remainingStudy > 0) {
+    scheduleModePrompt(remainingStudy, 'study');
+  }
+}
+
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  if (request && request.action === 'switchToStudy') {
+    try {
+      if (chrome && chrome.storage && chrome.storage.local) {
+        chrome.storage.local.remove(DISABLED_UNTIL_KEY);
+      }
+    } catch (e) {}
+    localStorage.removeItem(DISABLED_UNTIL_KEY);
+    pauseAllVideos();
+    showPurposeOverlay('study').then(() => {
+      const studyUntilNew = parseInt(localStorage.getItem(STUDY_UNTIL_KEY) || '0', 10);
+      const remainingStudyNew = studyUntilNew - Date.now();
+      window.location.href = 'https://www.youtube.com';
+      if (remainingStudyNew > 0) {
+        scheduleModePrompt(remainingStudyNew, 'study');
+      }
+    });
+    sendResponse({ status: 'ok' });
+  }
+});
+
+init();

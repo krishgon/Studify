@@ -1,0 +1,220 @@
+      overlay.querySelectorAll('.studify-btn').forEach((btn) => {
+        btn.addEventListener('click', () => askDuration(btn.dataset.mode));
+      });
+    } else {
+      askDuration(initialMode);
+    }
+
+    (document.body || document.documentElement).appendChild(overlay);
+  });
+}
+
+// Pause any playing videos on the page
+function pauseAllVideos() {
+  document.querySelectorAll('video').forEach((v) => v.pause());
+}
+
+// Remove the mode selection overlay if it exists
+function hidePurposeOverlay() {
+  const overlay = document.getElementById('studify-purpose-overlay');
+  if (overlay) overlay.remove();
+}
+
+// Listen for mode changes from other tabs
+window.addEventListener('storage', (e) => {
+  if (e.key === STUDY_UNTIL_KEY && e.newValue) {
+    // Another tab switched to study mode - return to the homepage
+    window.location.href = 'https://www.youtube.com';
+  } else if (e.key === DISABLED_UNTIL_KEY && e.newValue) {
+    // Another tab resumed browsing - dismiss the prompt and stay paused
+    hidePurposeOverlay();
+    pauseAllVideos();
+    const remaining = parseInt(e.newValue, 10) - Date.now();
+    if (remaining > 0) {
+      scheduleModePrompt(remaining, 'browse');
+    }
+  }
+});
+
+// Show the intent prompt again after a timer expires
+function scheduleModePrompt(remaining, mode) {
+  setTimeout(async () => {
+    if (mode === 'browse') {
+      try {
+        if (chrome && chrome.storage && chrome.storage.local) {
+          chrome.storage.local.remove(DISABLED_UNTIL_KEY);
+        }
+      } catch (e) {}
+      localStorage.removeItem(DISABLED_UNTIL_KEY);
+    } else {
+      localStorage.removeItem(STUDY_UNTIL_KEY);
+      try {
+        if (chrome && chrome.storage && chrome.storage.local) {
+          chrome.storage.local.remove(STUDY_UNTIL_KEY);
+        }
+      } catch (e) {}
+    }
+
+    pauseAllVideos();
+    const choice = await showPurposeOverlay();
+
+    if (choice === 'browse') {
+      const disabledUntilNew = parseInt(localStorage.getItem(DISABLED_UNTIL_KEY) || '0', 10);
+      const remainingNew = disabledUntilNew - Date.now();
+      if (remainingNew > 0) {
+        scheduleModePrompt(remainingNew, 'browse');
+      }
+    } else {
+      const studyUntilNew = parseInt(localStorage.getItem(STUDY_UNTIL_KEY) || '0', 10);
+      const remainingStudyNew = studyUntilNew - Date.now();
+      if (mode === 'browse') {
+        window.location.href = 'https://www.youtube.com';
+      } else if (remainingStudyNew > 0) {
+        scheduleModePrompt(remainingStudyNew, 'study');
+      }
+    }
+  }, remaining);
+}
+
+// Function to check if we're on a YouTube watch page
+function isYouTubeWatchPage() {
+  const currentUrl = window.location.href;
+  const isWatchPage = currentUrl.includes('/watch?v=');
+  // console.log('Studify: Current URL:', currentUrl);
+  // console.log('Studify: Is watch page:', isWatchPage);
+  return isWatchPage;
+}
+
+// Removed: getCurrentVideoId (unused after removing content filtering)
+
+
+// (Removed legacy category-based filtering helpers)
+
+// Simple goBack function that works better with YouTube
+function goBack() {
+  // Try to find YouTube's back button first
+  const backButton = document.querySelector('button[aria-label="Back"], .ytp-back-button, [data-tooltip*="back"]');
+  
+  if (backButton) {
+    backButton.click();
+  } else {
+    // Fallback to browser navigation with reload
+    window.history.back();
+    setTimeout(() => window.location.reload(), 100);
+  }
+}
+
+const HOME_FEED_STYLE_ID = 'studify-hide-home-feed';
+
+function isYouTubeHomePage() {
+  return window.location.pathname === '/';
+}
+
+function hideHomeFeed() {
+  let style = document.getElementById(HOME_FEED_STYLE_ID);
+  if (!style) {
+    style = document.createElement('style');
+    style.id = HOME_FEED_STYLE_ID;
+    style.textContent = `
+      ytd-rich-grid-renderer,
+      ytd-browse[page-subtype="home"] #contents,
+      ytd-browse[page-subtype="home"] ytd-rich-grid-row {
+        display: none !important;
+      }
+    `;
+    document.head.appendChild(style);
+  }
+}
+
+function showHomeFeed() {
+  const style = document.getElementById(HOME_FEED_STYLE_ID);
+  if (style) style.remove();
+}
+
+const WATCH_SIDEBAR_STYLE_ID = 'studify-hide-watch-sidebar';
+
+function hideWatchSidebar() {
+  let style = document.getElementById(WATCH_SIDEBAR_STYLE_ID);
+  if (!style) {
+    style = document.createElement('style');
+    style.id = WATCH_SIDEBAR_STYLE_ID;
+    style.textContent = `
+      #related {
+        display: none !important;
+      }
+    `;
+    document.head.appendChild(style);
+  }
+}
+
+function showWatchSidebar() {
+  const style = document.getElementById(WATCH_SIDEBAR_STYLE_ID);
+  if (style) style.remove();
+}
+
+const SHORTS_STYLE_ID = 'studify-hide-shorts';
+
+function enableShortsHider() {
+  let style = document.getElementById(SHORTS_STYLE_ID);
+  if (!style) {
+    style = document.createElement('style');
+    style.id = SHORTS_STYLE_ID;
+    style.textContent = `
+      /* Hide Shorts UI across the site */
+      ytd-reel-shelf-renderer,
+      ytd-rich-shelf-renderer[is-shorts],
+      ytd-reel-video-renderer,
+      ytd-reel-item-renderer,
+      a.yt-simple-endpoint[href^="/shorts"],
+      ytd-mini-guide-entry-renderer[aria-label="Shorts"],
+      ytd-guide-entry-renderer a[href^="/shorts"] {
+        display: none !important;
+      }
+    `;
+    document.head.appendChild(style);
+  }
+}
+
+function isYouTubeShortsPage() {
+  return window.location.pathname.startsWith('/shorts');
+}
+
+function blockShortsPage() {
+  document.body.innerHTML = `
+    <div id="studify-block-page">
+      <div class="studify-modal">
+        <img src="${STUDIFY_LOGO_URL}" alt="Studify logo" class="studify-logo" />
+        <h1>Shorts Blocked</h1>
+        <p>Studify blocks YouTube Shorts to keep you focused.</p>
+        <button id="studify-go-back-btn">Go Back</button>
+      </div>
+    </div>
+  `;
+  const style = document.createElement('style');
+  style.textContent = `
+    #studify-block-page {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #0f172a;
+      color: #e2e8f0;
+      font-family: 'Segoe UI', Roboto, sans-serif;
+    }
+    #studify-block-page .studify-modal {
+      background: #1e293b;
+      padding: 40px 30px;
+      border-radius: 12px;
+      text-align: center;
+      max-width: 480px;
+      width: 90%;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    }
+    .studify-logo {
+      width: 80px;
+      height: 80px;
+      margin-bottom: 20px;
+    }
+    #studify-block-page h1 {
+      margin-bottom: 16px;

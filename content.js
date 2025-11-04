@@ -5,8 +5,6 @@
 
 // Keep references to observers and listeners to avoid duplicates
 let navigateListener = null;
-let currentVideoId = null;
-let isAnalyzing = false;
 
 const DISABLED_UNTIL_KEY = 'studifyDisabledUntil';
 const STUDY_UNTIL_KEY = 'studifyStudyUntil';
@@ -307,166 +305,10 @@ function isYouTubeWatchPage() {
   return isWatchPage;
 }
 
-// Function to get current video ID from URL
-function getCurrentVideoId() {
-  const urlParams = new URLSearchParams(window.location.search);
-  return urlParams.get('v');
-}
+// Removed: getCurrentVideoId (unused after removing content filtering)
 
 
-// Retrieve the current video's category using multiple fallbacks
-function getVideoCategory() {
-  const genreMeta = document.querySelector('meta[itemprop="genre"]');
-  if (genreMeta) {
-    // console.log("from the meta tag");
-    return genreMeta.getAttribute('content');
-  }
-
-  // Try the globally exposed player response first
-  let playerResponse = window.ytInitialPlayerResponse;
-
-  // Some navigations don't update ytInitialPlayerResponse, so try ytplayer config
-  if (!playerResponse &&
-      window.ytplayer &&
-      window.ytplayer.config &&
-      window.ytplayer.config.args &&
-      window.ytplayer.config.args.raw_player_response) {
-    try {
-      playerResponse = JSON.parse(
-        window.ytplayer.config.args.raw_player_response
-      );
-    } catch (e) {
-      // console.error('Studify: Failed to parse raw_player_response', e);
-    }
-  }
-
-  if (playerResponse) {
-    if (
-      playerResponse.microformat &&
-      playerResponse.microformat.playerMicroformatRenderer &&
-      playerResponse.microformat.playerMicroformatRenderer.category
-    ) {
-      return playerResponse.microformat.playerMicroformatRenderer.category;
-    }
-    if (playerResponse.videoDetails && playerResponse.videoDetails.category) {
-      return playerResponse.videoDetails.category;
-    }
-  }
-
-  return null;
-}
-
-async function fetchCategoryFromOriginalHTML() {
-  try {
-    const res = await fetch(window.location.href, { cache: 'no-store', credentials: 'same-origin' });
-    const html = await res.text();
-
-    // Look for: <meta itemprop="genre" content="...">
-    const metaMatch = html.match(/<meta[^>]*itemprop=(['"])genre\1[^>]*>/i);
-    if (metaMatch) {
-      const tag = metaMatch[0];
-      const contentMatch = tag.match(/content=(['"])(.*?)\1/i);
-      if (contentMatch) {
-        // console.log('Studify: Category from original HTML meta tag');
-        return contentMatch[2];
-      }
-    }
-
-    // Fallback: try JSON-LD if present
-    const ldMatch = html.match(/<script[^>]*type=(['"])application\/ld\+json\1[^>]*>([\s\S]*?)<\/script>/i);
-    if (ldMatch) {
-      try {
-        const json = JSON.parse(ldMatch[2]);
-        if (json && json.genre) return json.genre;
-        if (Array.isArray(json) && json[0] && json[0].genre) return json[0].genre;
-      } catch (e) {}
-    }
-  } catch (e) {
-    // console.error('Studify: Failed to fetch original HTML', e);
-  }
-  return null;
-}
-
-async function isEducationalVideo() {
-  // console.log('Studify: Checking video category...');
-  let category = getVideoCategory();
-  if (!category) {
-    category = await fetchCategoryFromOriginalHTML();
-  }
-  // console.log('Studify: Detected category:', category);
-  return category === 'Education';
-}
-
-// Function to block the page if video is not educational
-function blockPage() {
-  // console.log('Studify: Blocking non-educational content');
-
-  document.body.innerHTML = `
-    <div id="studify-block-page">
-      <div class="studify-modal">
-        <img src="${STUDIFY_LOGO_URL}" alt="Studify logo" class="studify-logo" />
-        <h1>Access Blocked</h1>
-        <p>This YouTube video is not categorized as educational content.</p>
-        <p>Studify only allows educational videos to help you stay focused on learning.</p>
-        <button id="studify-go-back-btn">Go Back</button>
-      </div>
-    </div>
-  `;
-
-  const style = document.createElement('style');
-  style.textContent = `
-    #studify-block-page {
-      position: fixed;
-      inset: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: #0f172a;
-      color: #e2e8f0;
-      font-family: 'Segoe UI', Roboto, sans-serif;
-    }
-    #studify-block-page .studify-modal {
-      background: #1e293b;
-      padding: 40px 30px;
-      border-radius: 12px;
-      text-align: center;
-      max-width: 480px;
-      width: 90%;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-    }
-    .studify-logo {
-      width: 80px;
-      height: 80px;
-      margin-bottom: 20px;
-    }
-    #studify-block-page h1 {
-      margin-bottom: 16px;
-      color: #f87171;
-    }
-    #studify-block-page p {
-      margin-bottom: 20px;
-      color: #cbd5e1;
-      line-height: 1.4;
-    }
-    #studify-go-back-btn {
-      padding: 12px 24px;
-      border: none;
-      border-radius: 8px;
-      background: #3b82f6;
-      color: #ffffff;
-      font-size: 16px;
-      cursor: pointer;
-      transition: background 0.2s;
-    }
-    #studify-go-back-btn:hover { background: #2563eb; }
-  `;
-  document.head.appendChild(style);
-
-  const btn = document.getElementById('studify-go-back-btn');
-  if (btn) {
-    btn.addEventListener('click', goBack, { once: true });
-  }
-}
+// (Removed legacy category-based filtering helpers)
 
 // Simple goBack function that works better with YouTube
 function goBack() {
@@ -663,8 +505,6 @@ function setupSmartNavigationMonitoring() {
 
     // Small delay to ensure page is fully loaded
     setTimeout(() => {
-      // Reset analysis flag for new video
-      isAnalyzing = false;
       main();
     }, 1000);
   };

@@ -133,7 +133,7 @@ function updateStatus(isYouTube) {
         statusElement.className = 'status active';
         statusElement.innerHTML = `
             <strong>🟢 Active</strong><br>
-            Filtering YouTube content...
+            Focus tools enabled
         `;
     } else {
         statusElement.className = 'status inactive';

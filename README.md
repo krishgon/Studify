@@ -1,25 +1,25 @@
 # 📚 Studify - Chrome Extension
 
-A Chrome extension that blocks uneducational YouTube videos by reading video categories from the page source code.
+A Chrome extension for mindful YouTube usage: hides distracting UI (like Shorts and feeds), prompts your intent (Study/Browse), and blocks selected sites during study sessions.
 
 ## 🎯 Purpose
 
-Studify helps students stay focused on learning by automatically filtering YouTube content. It only allows videos categorized as "Education" and blocks all other content.
+Studify helps students stay focused on learning by reducing distractions on YouTube and across the web during study sessions.
 
 ## 🚀 Features
 
-- **Automatic Category Detection**: Parses YouTube's `ytInitialPlayerResponse` data in the page source to identify the video's category
-- **Smart Filtering**: Only allows educational content
-- **User-Friendly Blocking**: Clean, informative blocking page with navigation options
+- **Shorts Blocking**: Blocks YouTube Shorts pages and hides Shorts UI across the site
+- **Distraction Hiding**: Hides home feed and watch sidebar to reduce recommendations
+- **Study Mode Site Blocking**: Blocks popular and custom websites during active study sessions
 - **Real-Time Status**: Popup interface showing extension status
-- **Intent Check**: Full‑screen prompt when opening YouTube asks whether you're studying or browsing and for how long (using preset durations). Browsing requires typing *"I am sure I am not procrastinating"* and temporarily disables filtering, while study sessions persist for the chosen time even across reloads.
+- **Intent Check**: Full‑screen prompt when opening YouTube asks whether you're studying or browsing and for how long (using preset durations). Browsing temporarily disables the prompt; study sessions persist for the chosen time even across reloads.
 
 ## 📁 File Structure
 
 ```
 studify/
 ├── manifest.json      # Extension configuration
-├── content.js         # Main content script (runs on YouTube pages)
+├── content.js         # Main content script (Shorts blocking, hide feeds/sidebar, intent prompt)
 ├── popup.html         # Extension popup interface
 ├── popup.js           # Popup logic and status updates
 ├── icons/             # Extension icons (16x16, 48x48, 128x128)
@@ -48,20 +48,17 @@ studify/
 ## 🎨 Customization
 
 - **Icons**: Replace placeholder icons in the `icons/` folder
-- **Blocking Page**: Modify the `blockPage()` function in `content.js`
 - **Styling**: Update CSS in `popup.html` and `content.js`
 
 ## 🔮 Future Enhancements
 
-- [ ] Add whitelist/blacklist functionality
 - [ ] Create settings page for user preferences
 - [ ] Add statistics and usage tracking
 - [ ] Support for other educational platforms
 
 ## ⚠️ Limitations
 
-- Detection relies on YouTube's current page structure; layout changes may break category parsing.
-- Videos without accessible category metadata (such as some live streams or restricted videos) may bypass the filter.
+- YouTube layout changes can affect UI selectors used to hide feeds/sidebars.
 
 ## 📝 Development Notes
 
